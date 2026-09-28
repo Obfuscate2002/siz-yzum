@@ -1,6 +1,7 @@
 import { Breadcrumb, Layout, theme } from 'antd';
 import {Sidebar} from "./Sidebar.tsx";
 import {HeaderLayout} from "./Header.tsx";
+import {EmployeesTable} from "../employees/EmployeesTable.tsx";
 
 const {Content, Footer} = Layout;
 
@@ -19,7 +20,7 @@ const AppLayout: React.FC = () => {
             <Layout>
                 <HeaderLayout/>
                 <Content style={{ margin: '0 16px' }}>
-                    <Breadcrumb style={{ margin: '16px 0' }} items={[{ title: 'User' }, { title: 'Bill' }]} />
+                    <Breadcrumb style={{ margin: '16px 0' }} items={[{ title: 'Главная' }, { title: 'Сотрудники' }]} />
                     <div
                         style={{
                             padding: 24,
@@ -28,11 +29,11 @@ const AppLayout: React.FC = () => {
                             borderRadius: borderRadiusLG,
                         }}
                     >
-                        Bill is a cat.
+                       <EmployeesTable/>
                     </div>
                 </Content>
                 <Footer style={{ textAlign: 'center' }}>
-                    Ant Design ©{currentYear} Created by Ant UED
+                    СИЗ ЯРЗУМ ©{currentYear} Created by Anton
                 </Footer>
             </Layout>
         </Layout>

@@ -35,9 +35,12 @@ export const Sidebar = () => {
     const [collapsed, setCollapsed] = useState(false);
 
     return (
-
             <Sider collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
-                <div className="text-white">УЧЕТ СИЗ</div>
+                <div className="flex flex-col leading-tight overflow-hidden items-center">
+                    <span className={'text-white text-base font-semibold tracking-wide whitespace-nowrap'}>
+                        УЧЕТ СИЗ
+                    </span>
+                </div>
                 <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline" items={items} />
             </Sider>
 
