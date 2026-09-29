@@ -63,7 +63,7 @@ export const EmployeesTable = () => {
     })
 
     return (
-        <div className={'w-full overflow-x-auto rounded-lg border border-gray-200 shadow-sm'}>
+        <div className={'w-full overflow-x-auto rounded-lg border border-gray-200 shadow-sm m-3'}>
             <table className={'w-full min-w-[600px] border-collapse text-left text-sm'}>
                 <thead className={'bg-gray-100 text-xs uppercase tracking-wider text-gray-600'}>
                 {table.getHeaderGroups().map((headerGroup) => (

@@ -2,6 +2,7 @@ import { Breadcrumb, Layout, theme } from 'antd';
 import {Sidebar} from "./Sidebar.tsx";
 import {HeaderLayout} from "./Header.tsx";
 import {EmployeesTable} from "../employees/EmployeesTable.tsx";
+import {EmployeeModal} from "../employees/EmployeeModal.tsx";
 
 const {Content, Footer} = Layout;
 
@@ -29,6 +30,8 @@ const AppLayout: React.FC = () => {
                             borderRadius: borderRadiusLG,
                         }}
                     >
+
+                        <EmployeeModal/>
                        <EmployeesTable/>
                     </div>
                 </Content>
