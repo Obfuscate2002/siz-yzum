@@ -2,10 +2,8 @@ import {Menu, type MenuProps} from "antd";
 import React from "react";
 import Sider from "antd/es/layout/Sider";
 import {
-    BankOutlined,
-    DesktopOutlined,
-    FileOutlined,
-    TeamOutlined,
+    BankOutlined, CheckSquareOutlined,
+    HomeOutlined, SafetyOutlined, SettingOutlined, UsergroupAddOutlined,
     UserOutlined
 } from "@ant-design/icons";
 
@@ -26,15 +24,13 @@ function getItem(
 }
 
 const items: MenuItem[] = [
-    getItem('Сотрудники', '1', <UserOutlined />),
-    getItem('СИЗ', '2', <DesktopOutlined />),
-    getItem('User', 'sub1', <UserOutlined />, [
-        getItem('Tom', '3'),
-        getItem('Bill', '4'),
-        getItem('Alex', '5'),
-    ]),
-    getItem('Team', 'sub2', <TeamOutlined />, [getItem('Team 1', '6'), getItem('Team 2', '8')]),
-    getItem('Files', '9', <FileOutlined />),
+    getItem('Главная', '1', <HomeOutlined />),
+    getItem('Сотрудники', '2', <UsergroupAddOutlined />),
+    getItem('СИЗ', '3', <SafetyOutlined />),
+    getItem('Выдача', '4', <CheckSquareOutlined />),
+    getItem('Настройки', '5', <SettingOutlined />),
+
+
 ];
 
 export const Sidebar = () => {
@@ -51,18 +47,20 @@ export const Sidebar = () => {
                     <div className={'flex-1'}>
                         <Menu className={'bg-gray-50'} defaultSelectedKeys={['1']} mode="inline" items={items} />
                     </div>
-                    <div className={'flex flex-col m-3 justify-center items-center'}>
-                        <div className={'flex gap-2'}>
-                            <UserOutlined  className={'text-2xl'}/>
-                            <span>
+                    <div className={'flex flex-row justify-center items-center'}>
+                        <UserOutlined  className={'text-3xl'}/>
+                        <div className={'flex flex-col m-3 justify-center items-center'}>
+                            <div className={'flex gap-2'}>
+
+                                <span>
                             vasya@yrzum76.su
                         </span>
-                        </div>
-                        <span className={'text-black/40'}>
+                            </div>
+                            <span className={'text-black/40'}>
                             Пользователь
                         </span>
+                        </div>
                     </div>
-
                 </div>
 
             </Sider>
