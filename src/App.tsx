@@ -1,13 +1,13 @@
 import './App.css'
 import AppLayout from "./components/layout/AppLayout.tsx";
 
+
 function App() {
 
 
   return (
     <>
-      <AppLayout/>
-
+            <AppLayout/>
     </>
   )
 }
