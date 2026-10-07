@@ -37,9 +37,7 @@ const stylesFn: ModalProps['styles'] = (info): GetProp<ModalProps, 'styles', 'Re
 
 export const EmployeeModal = () => {
     const [modalFnOpen, setModalFnOpen] = useState(false);
-
     const [form] = Form.useForm();
-
     const handleClose = () => {
         form.resetFields();
         setModalFnOpen(false);
@@ -47,6 +45,7 @@ export const EmployeeModal = () => {
 
     const handleSuccess = () => {
         setModalFnOpen(false);
+
     }
 
     const sharedProps: ModalProps = {
