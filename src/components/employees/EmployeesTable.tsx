@@ -9,15 +9,15 @@ import {EditTwoTone, UserOutlined} from "@ant-design/icons";
 import {ActionsCell} from "./ActionsCell.tsx";
 import {useEffect, useState} from "react";
 import {Input, message} from "antd";
-import {pb} from "../../pocketbase/pocketbase.ts";
+import {ImportEmployees} from "./ImportEmployees.tsx";
+import {EmployeeModal} from "./EmployeeModal.tsx";
+import {getEmployes} from "../../hooks/useEmployess.tsx";
 
 type Employees = {
     fullName: string
     position: string
     unit: string
     personnelNumber: string
-    id: string
-
 }
 
 const features = tableFeatures({
@@ -29,6 +29,11 @@ const features = tableFeatures({
 })
 
 const columns: Array<ColumnDef<typeof features, Employees, unknown>> = [
+    {
+        accessorKey: 'personnelNumber',
+        header: 'Таб №.',
+        cell: (info) => info.getValue(),
+    },
     {
         accessorKey: 'fullName',
         header: 'ФИО',
@@ -46,32 +51,31 @@ const columns: Array<ColumnDef<typeof features, Employees, unknown>> = [
         cell: (info) => info.getValue(),
     },
     {
-        accessorKey: 'id',
-        header: 'Таб №.',
-        cell: (info) => info.getValue(),
-    },
-    {
         accessorKey: `editing`,
         header: () => <EditTwoTone />,
         cell: () => <ActionsCell/>,
-    }
+    },
+    {
+        accessorKey: `comment`,
+        header: 'Комментарий',
+        cell: (info) => info.getValue(),
+    },
 ]
 
 export const EmployeesTable = () => {
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
     const [employees, setEmployees] = useState<Array<Employees>>([])
 
-    useEffect(() => {
-        const loadEmployees = async () => {
-            try {
-                await pb.collection('users').authWithPassword('admin@siz-yzum.local', 'siz-yzum2026');
-
-                const data = await pb.collection('employees').getFullList<Employees>();
-                setEmployees(data)
-            } catch (error) {
-                message.error('Ошибка')
-            }
+    const loadEmployees = async ()  => {
+        try {
+            const data = await getEmployes()
+            setEmployees(data)
+        } catch (error) {
+            message.error('Ошибка')
         }
+    }
+
+    useEffect(() => {
         loadEmployees()
     }, []);
 
@@ -100,6 +104,7 @@ export const EmployeesTable = () => {
 
     return (
         <div>
+            <EmployeeModal loadEmployees={loadEmployees}/>
             <Input
                 onChange={handleSearchChange}
                 className={'m-3 w-102'}
@@ -108,6 +113,7 @@ export const EmployeesTable = () => {
                 prefix={<UserOutlined />}
 
             />
+            <ImportEmployees />
             <div className={'w-full overflow-x-auto rounded-lg border border-gray-200 shadow-sm m-3'}>
                 <table className={'w-full min-w-[600px] border-collapse text-left text-sm'}>
                     <thead className={'bg-gray-100 text-xs uppercase tracking-wider text-gray-600'}>

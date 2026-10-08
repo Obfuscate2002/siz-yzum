@@ -1,6 +1,5 @@
 import {Form, type FormInstance, Input, message} from "antd";
-import {addDoc, collection} from "firebase/firestore"
-import {db} from "../../firebase/config.ts";
+import {pb} from "../../pocketbase/pocketbase.ts";
 
 interface Props {
     form: FormInstance,
@@ -17,18 +16,14 @@ type DataProps = {
 
 export const EmployeesForm = ({form, onSuccess}: Props) => {
    const handleSubmit = async (values: DataProps) => {
-       console.log('Данные из формы:', values);
        try {
-          const data = await addDoc(collection(db, 'employees'), {
+           await pb.collection('employees').create({
                fullName: values.fullName,
                position: values.position,
                unit: values.unit,
-               createdAt: new Date().toISOString(),
                personnelNumber: values.personnelNumber,
            })
            message.success("Сотрудник добавлен")
-           console.log(data.id)
-
            onSuccess?.()
        } catch (error) {
            message.error(error instanceof Error ? error.message : 'Не удалось добавить сотрудника');

@@ -35,7 +35,7 @@ const stylesFn: ModalProps['styles'] = (info): GetProp<ModalProps, 'styles', 'Re
     return {};
 };
 
-export const EmployeeModal = () => {
+export const EmployeeModal = ({loadEmployees}) => {
     const [modalFnOpen, setModalFnOpen] = useState(false);
     const [form] = Form.useForm();
     const handleClose = () => {
@@ -45,7 +45,7 @@ export const EmployeeModal = () => {
 
     const handleSuccess = () => {
         setModalFnOpen(false);
-
+        loadEmployees();
     }
 
     const sharedProps: ModalProps = {
@@ -79,7 +79,7 @@ export const EmployeeModal = () => {
             <Modal
                 {...sharedProps}
                 footer={footer}
-                title="Custom Function Modal"
+                title="Добавить сотрудника"
                 styles={stylesFn}
                 mask={{ enabled: true, blur: true }}
                 open={modalFnOpen}
