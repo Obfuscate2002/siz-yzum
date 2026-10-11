@@ -92,7 +92,7 @@ export const EmployeesTable = () => {
 
     })
 
-    const handleSearchChange = (e) => {
+    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setColumnFilters([
             {
                 id: 'fullName',

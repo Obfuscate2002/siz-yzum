@@ -4,6 +4,10 @@ import {useState} from "react";
 import {EmployeesForm} from "./EmployeesForm.tsx";
 import {PlusCircleOutlined} from "@ant-design/icons";
 
+interface EmployeeModalProps  {
+    loadEmployees: () => Promise<void>;
+}
+
 const classNames = createStaticStyles(({ css }) => ({
     container: css`
     border-radius: 10px;
@@ -35,7 +39,7 @@ const stylesFn: ModalProps['styles'] = (info): GetProp<ModalProps, 'styles', 'Re
     return {};
 };
 
-export const EmployeeModal = ({loadEmployees}) => {
+export const EmployeeModal = ({loadEmployees}: EmployeeModalProps) => {
     const [modalFnOpen, setModalFnOpen] = useState(false);
     const [form] = Form.useForm();
     const handleClose = () => {

@@ -4,6 +4,10 @@ import {useState} from "react";
 import {PlusCircleOutlined} from "@ant-design/icons";
 import {EmployeesForm} from "../employees/EmployeesForm.tsx";
 
+interface PpeModalProps  {
+    loadPpeItems: () => Promise<void>;
+}
+
 const classNames = createStaticStyles(({ css }) => ({
     container: css`
     border-radius: 10px;
@@ -35,7 +39,7 @@ const stylesFn: ModalProps['styles'] = (info): GetProp<ModalProps, 'styles', 'Re
     return {};
 };
 
-export const PpeItemModal = ({loadPpeItems}) => {
+export const PpeItemModal = ({loadPpeItems}: PpeModalProps) => {
     const [modalFnOpen, setModalFnOpen] = useState(false);
     const [form] = Form.useForm();
     const handleClose = () => {

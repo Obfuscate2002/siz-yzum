@@ -96,7 +96,7 @@ export const PpeItemsTable = ()=>{
 
     })
 
-    const handleSearchChange = (e) => {
+    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setColumnFilters([
             {
                 id: 'fullName',
