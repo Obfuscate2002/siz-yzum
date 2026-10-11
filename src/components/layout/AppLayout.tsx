@@ -1,11 +1,40 @@
 import { Breadcrumb, Layout, theme } from 'antd';
 import {Sidebar} from "./Sidebar.tsx";
 import {HeaderLayout} from "./Header.tsx";
-import {EmployeesTable} from "../employees/EmployeesTable.tsx";
+import {Outlet, useLocation} from "react-router";
 const {Content, Footer} = Layout;
 
+type PagePath = '/employees' | '/ppe' | '/norms' | '/dashboard';
 
 const AppLayout: React.FC = () => {
+
+    const location = useLocation();
+    const currentPath = location.pathname;
+
+    const pageTitles: Record<PagePath, string> = {
+        '/dashboard': 'Дашборд',
+        '/employees': 'Сотрудники',
+        '/ppe': 'СИЗ',
+        '/norms': 'Нормы',
+
+    };
+
+    const currentTitle: string =
+        currentPath in pageTitles
+            ? pageTitles[currentPath as PagePath]
+            : 'Страница не найдена';
+
+    const items = [
+        {
+            title: 'Главная',
+            href: '/',
+        },
+        {
+            title: currentTitle,
+        },
+    ];
+
+
 
     const {
         token: { colorBgContainer, borderRadiusLG },
@@ -19,7 +48,7 @@ const AppLayout: React.FC = () => {
             <Layout>
                 <HeaderLayout/>
                 <Content style={{ margin: '0 16px' }}>
-                    <Breadcrumb style={{ margin: '16px 0' }} items={[{ title: 'Главная' }, { title: 'Сотрудники' }]} />
+                    <Breadcrumb style={{ margin: '16px 0' }} items={items} />
                     <div
                         style={{
                             padding: 24,
@@ -29,9 +58,9 @@ const AppLayout: React.FC = () => {
                         }}
                     >
 
-
-                       <EmployeesTable/>
+                        <Outlet/>
                     </div>
+
                 </Content>
                 <Footer style={{ textAlign: 'center' }}>
                     СИЗ ЯРЗУМ ©{currentYear} Created by Anton

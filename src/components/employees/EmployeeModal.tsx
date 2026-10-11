@@ -90,7 +90,5 @@ export const EmployeeModal = ({loadEmployees}) => {
                 <EmployeesForm form={form} onSuccess={handleSuccess}/>
             </Modal>
         </div>
-
-
     )
 }

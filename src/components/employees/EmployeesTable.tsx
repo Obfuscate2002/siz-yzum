@@ -71,7 +71,8 @@ export const EmployeesTable = () => {
             const data = await getEmployes()
             setEmployees(data)
         } catch (error) {
-            message.error('Ошибка')
+            console.error('Ошибка загрузки сотрудников:', error);
+            message.warning('Включен Strict mode: Сотрудники');
         }
     }
 
@@ -99,8 +100,6 @@ export const EmployeesTable = () => {
             }
         ])
     }
-
-
 
     return (
         <div>

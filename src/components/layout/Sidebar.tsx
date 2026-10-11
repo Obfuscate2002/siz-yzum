@@ -6,6 +6,7 @@ import {
     HomeOutlined, SafetyOutlined, SettingOutlined, UsergroupAddOutlined,
     UserOutlined
 } from "@ant-design/icons";
+import {useLocation, useNavigate} from "react-router";
 
 type MenuItem = Required<MenuProps>['items'][number];
 
@@ -24,16 +25,21 @@ function getItem(
 }
 
 const items: MenuItem[] = [
-    getItem('Главная', '1', <HomeOutlined />),
-    getItem('Сотрудники', '2', <UsergroupAddOutlined />),
-    getItem('СИЗ', '3', <SafetyOutlined />),
-    getItem('Выдача', '4', <CheckSquareOutlined />),
-    getItem('Настройки', '5', <SettingOutlined />),
-
-
+    getItem('Главная', 'dashboard', <HomeOutlined />),
+    getItem('Сотрудники', 'employees', <UsergroupAddOutlined />),
+    getItem('СИЗ', 'ppe', <SafetyOutlined />),
+    getItem('Нормы', 'norms', <CheckSquareOutlined />),
+    getItem('Настройки', 'settings', <SettingOutlined />),
 ];
 
 export const Sidebar = () => {
+
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    const handleNavigation: MenuProps['onClick'] = (event) => {
+        navigate(event.key);
+    }
 
     return (
         <div className={'min-h-screen'}>
@@ -45,7 +51,13 @@ export const Sidebar = () => {
                     </span>
                     </div>
                     <div className={'flex-1'}>
-                        <Menu className={'bg-gray-50'} defaultSelectedKeys={['1']} mode="inline" items={items} />
+                        <Menu
+                            className={'bg-gray-50'}
+                            selectedKeys={[location.pathname.replace('/', '')]}
+                            mode="inline"
+                            items={items}
+                            onClick={handleNavigation}
+                        />
                     </div>
                     <div className={'flex flex-row justify-center items-center'}>
                         <UserOutlined  className={'text-3xl'}/>
