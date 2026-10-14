@@ -1,5 +1,6 @@
 
-export const PageNorms = () => {
+export const PageIssuanceNorms = () => {
+
     return (
         <div>
             PageNorms

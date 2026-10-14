@@ -28,7 +28,8 @@ const items: MenuItem[] = [
     getItem('Главная', 'dashboard', <HomeOutlined />),
     getItem('Сотрудники', 'employees', <UsergroupAddOutlined />),
     getItem('СИЗ', 'ppe', <SafetyOutlined />),
-    getItem('Нормы', 'norms', <CheckSquareOutlined />),
+    getItem('Справочник видов норм', 'norms_catalog', <CheckSquareOutlined />),
+    getItem('Нормы выдачи', 'issuance_norms'),
     getItem('Настройки', 'settings', <SettingOutlined />),
 ];
 

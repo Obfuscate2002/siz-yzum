@@ -37,7 +37,7 @@ const COLLECTION = 'ppe_catalog';
 const normalize = (value: unknown): string =>
     String(value ?? '').trim();
 
-export const ImportPpeItems = ({
+export const ImportNorms = ({
                                    onSuccess,
                                }: ImportPpeItemsProps) => {
     const [loading, setLoading] = useState(false);
@@ -270,7 +270,7 @@ export const ImportPpeItems = ({
                 loading={loading}
                 disabled={loading}
             >
-                Импорт СИЗ из Excel
+                Импорт Норм из CSV
             </Button>
         </Upload>
     );

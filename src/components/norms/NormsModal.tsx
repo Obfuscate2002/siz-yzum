@@ -39,7 +39,7 @@ const stylesFn: ModalProps['styles'] = (info): GetProp<ModalProps, 'styles', 'Re
     return {};
 };
 
-export const PpeItemModal = ({loadPpeItems}: PpeModalProps) => {
+export const NormsModal = ({loadPpeItems}: PpeModalProps) => {
     const [modalFnOpen, setModalFnOpen] = useState(false);
     const [form] = Form.useForm();
     const handleClose = () => {
@@ -77,7 +77,7 @@ export const PpeItemModal = ({loadPpeItems}: PpeModalProps) => {
     return (
             <div className={'ml-3'}>
                 <Button type="primary" onClick={() => setModalFnOpen(true)}>
-                    <PlusCircleOutlined /> Добавить СИЗ
+                    <PlusCircleOutlined /> Добавить норму
                 </Button>
                 <Modal
                     {...sharedProps}

@@ -1,29 +1,28 @@
-import {Input, message} from "antd";
-import {UserOutlined} from "@ant-design/icons";
-import {useEffect, useState} from "react";
 import {
     type ColumnDef,
-    columnFilteringFeature,
-    type ColumnFiltersState,
-    createFilteredRowModel, filterFn_includesString,
-    tableFeatures,
-    useTable
+    columnFilteringFeature, type ColumnFiltersState,
+    createFilteredRowModel,
+    filterFn_includesString,
+    tableFeatures, useTable
 } from "@tanstack/react-table";
-import {getPpeItems} from "../../hooks/usePpeItems.tsx";
-import {PpeItemModal} from "./PpeItemModal.tsx";
-import {ImportPpeItems} from "./ImportPpeItems.tsx";
+import {useEffect, useState} from "react";
+import {Input, message} from "antd";
+import {UserOutlined} from "@ant-design/icons";
+import {getPpeNomenclatures} from "../../hooks/usePpeNomenclature.tsx";
+import {PpeNomenclaturesModal} from "./PpeNomenclaturesModal.tsx";
+import {ImportPpeNomenclatures} from "./ImportPpeNomenclatures.tsx";
 
-
-type PpeItem = {
+type PpeNomenclature = {
     id: string;
-    created: string;
-    updated: string;
     name: string;
-    category: string;
-    unit: string;
-    description: string
-    isActive: boolean;
-}
+    number: string;
+    type: string;
+    gender: 'Мужской' | 'Женский' | 'Универсальный';
+    is_archived: boolean;
+    use_barcode: boolean;
+    barcode: string;
+    comment: string;
+};
 
 const features = tableFeatures({
     columnFilteringFeature,
@@ -33,30 +32,30 @@ const features = tableFeatures({
     },
 })
 
-const columns: Array<ColumnDef<typeof features, PpeItem, unknown>> = [
+const columns: Array<ColumnDef<typeof features, PpeNomenclature, unknown>> = [
+    {
+        accessorKey: 'number',
+        header: '№',
+        cell: (info) => info.getValue(),
+    },
     {
         accessorKey: 'name',
-        header: 'Наименование СИЗ',
+        header: 'Наименование',
         cell: (info) => info.getValue(),
     },
     {
-        accessorKey: 'category',
-        header: 'Категория',
+        accessorKey: 'type',
+        header: 'Тип номенклатуры',
         cell: (info) => info.getValue(),
     },
     {
-        accessorKey: 'unit',
-        header: 'Ед. изм.',
+        accessorKey: 'gender',
+        header: 'Пол',
         cell: (info) => info.getValue(),
     },
     {
-        accessorKey: 'description',
-        header: 'Описание',
-        cell: (info) => info.getValue(),
-    },
-    {
-        accessorKey: `isActive`,
-        header: 'Статус',
+        accessorKey: `comment`,
+        header: 'Комментарий',
         cell: (info) => info.getValue(),
     },
     {
@@ -66,14 +65,15 @@ const columns: Array<ColumnDef<typeof features, PpeItem, unknown>> = [
     },
 ]
 
-export const PpeItemsTable = ()=>{
-    const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
-    const [ppeItems, setPpeItems] = useState<Array<PpeItem>>([])
 
-    const loadPpeItems = async ()  => {
+export const PpeNomenclatureTable = () => {
+    const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+    const [ppeNomenclatures, setPpeNomenclatures] = useState<Array<PpeNomenclature>>([])
+
+    const loadPpeNomenclatures = async ()  => {
         try {
-            const data = await getPpeItems()
-            setPpeItems(data)
+            const data = await getPpeNomenclatures()
+            setPpeNomenclatures(data)
         } catch (error) {
             console.error('Ошибка загрузки СИЗ:', error);
             message.warning('Включен Strict mode: СИЗы');
@@ -81,14 +81,14 @@ export const PpeItemsTable = ()=>{
     }
 
     useEffect(() => {
-        loadPpeItems()
+        loadPpeNomenclatures()
     }, []);
 
     const table = useTable({
         key: 'ppeItems-table',
         features,
         columns,
-        data: ppeItems,
+        data: ppeNomenclatures,
         state: {
             columnFilters
         },
@@ -107,7 +107,7 @@ export const PpeItemsTable = ()=>{
 
     return (
         <div>
-            <PpeItemModal loadPpeItems={loadPpeItems}/>
+            <PpeNomenclaturesModal loadPpeNomenclatures={loadPpeNomenclatures}/>
             <Input
                 onChange={handleSearchChange}
                 className={'m-3 w-102'}
@@ -116,7 +116,7 @@ export const PpeItemsTable = ()=>{
                 prefix={<UserOutlined />}
 
             />
-            <ImportPpeItems />
+            <ImportPpeNomenclatures />
             <div className={'w-full overflow-x-auto rounded-lg border border-gray-200 shadow-sm m-3'}>
                 <table className={'w-full min-w-[600px] border-collapse text-left text-sm'}>
                     <thead className={'bg-gray-100 text-xs uppercase tracking-wider text-gray-600'}>
