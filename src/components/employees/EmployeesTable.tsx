@@ -12,8 +12,10 @@ import {Input, message} from "antd";
 import {ImportEmployees} from "./ImportEmployees.tsx";
 import {EmployeeModal} from "./EmployeeModal.tsx";
 import {getEmployes} from "../../hooks/useEmployess.tsx";
+import {EmployeeRecord} from "./EmployeeRecord.tsx";
 
 type Employees = {
+    id: string;
     fullName: string
     position: string
     unit: string
@@ -65,6 +67,12 @@ const columns: Array<ColumnDef<typeof features, Employees, unknown>> = [
 export const EmployeesTable = () => {
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
     const [employees, setEmployees] = useState<Array<Employees>>([])
+    const [selectedEmployeeId, setSelectedEmployeeId] = useState<string | null>(null);
+
+    const handleClick = (id: string | null) => {
+            setSelectedEmployeeId(id);
+
+    }
 
     const loadEmployees = async ()  => {
         try {
@@ -101,8 +109,16 @@ export const EmployeesTable = () => {
         ])
     }
 
+    const onClose = () => {
+        setSelectedEmployeeId(null)
+    }
+
     return (
         <div>
+            <EmployeeRecord
+                selectedEmployeeId={selectedEmployeeId}
+                onClose={onClose}
+            />
             <EmployeeModal loadEmployees={loadEmployees}/>
             <Input
                 onChange={handleSearchChange}
@@ -113,11 +129,12 @@ export const EmployeesTable = () => {
 
             />
             <ImportEmployees />
+
             <div className={'w-full overflow-x-auto rounded-lg border border-gray-200 shadow-sm m-3'}>
                 <table className={'w-full min-w-[600px] border-collapse text-left text-sm'}>
                     <thead className={'bg-gray-100 text-xs uppercase tracking-wider text-gray-600'}>
                     {table.getHeaderGroups().map((headerGroup) => (
-                        <tr key={headerGroup.id}>
+                        <tr key={headerGroup.id} >
                             {headerGroup.headers.map((header) => (
                                 <th key={header.id} className={'px-4 py-3 font-semibold border-b border-gray-200'}>
                                     {header.isPlaceholder ? null : (
@@ -130,7 +147,9 @@ export const EmployeesTable = () => {
                     </thead>
                     <tbody className={'divide-y divide-gray-200'}>
                     {table.getRowModel().rows.map((row, index) => (
-                        <tr key={row.id} className={`transition-colors hover:bg-blue-50/60 ${
+                        <tr key={row.id}
+                            onClick={() => handleClick(row.original.id)}
+                            className={`transition-colors hover:bg-blue-50/60 ${
                             index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'
                         }`}>
                             {row.getAllCells().map((cell) => (
@@ -143,6 +162,7 @@ export const EmployeesTable = () => {
                     </tbody>
                 </table>
             </div>
+
         </div>
 
 

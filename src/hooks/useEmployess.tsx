@@ -1,6 +1,7 @@
 import {pb} from "../pocketbase/pocketbase.ts";
 
 type Employees = {
+    id: string;
     fullName: string
     position: string
     unit: string
