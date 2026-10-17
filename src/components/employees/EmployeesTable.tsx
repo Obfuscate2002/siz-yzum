@@ -13,14 +13,8 @@ import {ImportEmployees} from "./ImportEmployees.tsx";
 import {EmployeeModal} from "./EmployeeModal.tsx";
 import {getEmployes} from "../../hooks/useEmployess.tsx";
 import {EmployeeRecord} from "./EmployeeRecord.tsx";
+import type {Employees} from "../../types/employee.ts";
 
-type Employees = {
-    id: string;
-    fullName: string
-    position: string
-    unit: string
-    personnelNumber: string
-}
 
 const features = tableFeatures({
     columnFilteringFeature,
@@ -43,9 +37,10 @@ const columns: Array<ColumnDef<typeof features, Employees, unknown>> = [
         filterFn: 'includesString',
     },
     {
-        accessorKey: 'position',
+        accessorKey: 'positionRelation',
         header: 'Должность',
-        cell: (info) => info.getValue(),
+        cell: ({row}) =>
+            row.original.expand?.positionRelation?.name ?? 'Не указана'
     },
     {
         accessorKey: 'unit',
@@ -71,8 +66,9 @@ export const EmployeesTable = () => {
 
     const handleClick = (id: string | null) => {
             setSelectedEmployeeId(id);
-
     }
+
+    const employee = employees.find(employee => employee.id === selectedEmployeeId)
 
     const loadEmployees = async ()  => {
         try {
@@ -118,6 +114,7 @@ export const EmployeesTable = () => {
             <EmployeeRecord
                 selectedEmployeeId={selectedEmployeeId}
                 onClose={onClose}
+                employee={employee}
             />
             <EmployeeModal loadEmployees={loadEmployees}/>
             <Input

@@ -4,7 +4,7 @@ import {HeaderLayout} from "./Header.tsx";
 import {Outlet, useLocation} from "react-router";
 const {Content, Footer} = Layout;
 
-type PagePath = '/employees' | '/ppe' | '/norms' | '/dashboard';
+type PagePath = '/employees' | '/ppe' | '/norms' | '/dashboard' | '/settings' | '/norms_catalog' | '/issuance_norms';
 
 const AppLayout: React.FC = () => {
 
@@ -16,6 +16,9 @@ const AppLayout: React.FC = () => {
         '/employees': 'Сотрудники',
         '/ppe': 'СИЗ',
         '/norms': 'Нормы',
+        '/norms_catalog': 'Справочник видов номенклатуры',
+        '/issuance_norms': 'Нормы выдачи',
+        '/settings': 'Настройки',
 
     };
 
@@ -27,7 +30,7 @@ const AppLayout: React.FC = () => {
     const items = [
         {
             title: 'Главная',
-            href: '/',
+            href: '/dashboard',
         },
         {
             title: currentTitle,

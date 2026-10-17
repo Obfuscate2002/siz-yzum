@@ -6,6 +6,7 @@ import {PageNormsCatalog} from "./pages/PageNormsCatalog.tsx";
 import { PagePpes } from './pages/PagePpes.tsx';
 import {PageDashboard} from "./pages/PageDashboard.tsx";
 import {PageIssuanceNorms} from "./pages/PageIssuanceNorms.tsx";
+import { PageSettings } from './pages/PageSettings.tsx';
 
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
                 <Route path={'norms_catalog'} element={<PageNormsCatalog/>}/>
                 <Route path={'issuance_norms'} element={<PageIssuanceNorms/>}/>
                 <Route path={'ppe'} element={<PagePpes/>}/>
+                <Route path={'settings'} element={<PageSettings/>}/>
             </Route>
         </Routes>
 
