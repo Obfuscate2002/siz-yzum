@@ -12,7 +12,6 @@ import {
     Col, Divider
 } from "antd";
 import {createStaticStyles} from "antd-style";
-import { useState } from "react";
 import Text from "antd/es/typography/Text";
 import {EmployeeRecordTable} from "./EmployeeRecordTable.tsx";
 import type {Employees} from "../../types/employee.ts";
@@ -148,9 +147,6 @@ type SelectProp = {
 }
 
 export const EmployeeRecord = ({selectedEmployeeId, onClose, employee}: SelectProp) => {
-
-    const [editingId, setEditingId] = useState<boolean>(false);
-
     const sharedProps: DrawerProps = {
         classNames,
         size: 800,

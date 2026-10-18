@@ -11,9 +11,9 @@ import {UserOutlined} from "@ant-design/icons";
 import {useEffect, useState} from "react";
 import {Input, message} from "antd";
 import {ImportEmployees} from "../employees/ImportEmployees.tsx";
-import {getIssuanceNorms} from "../../hooks/useIssuanceNorms.tsx";
+import {getIssuanceNormHeaders} from "../../hooks/useIssuanceNorms.tsx";
 import {IssuanceNormModal} from "./IssuanceNormModal.tsx";
-import type {IssuanceNormExpanded} from "../../types/norms.ts";
+import type {IssuanceNormHeaderExpanded} from "../../types/norms.ts";
 import {IssuanceNormRecord} from "./IssuanceNormRecord.tsx";
 
 const features = tableFeatures({
@@ -24,45 +24,38 @@ const features = tableFeatures({
     },
 })
 
-const columns: Array<ColumnDef<typeof features, IssuanceNormExpanded, unknown>> = [
+const columns: Array<ColumnDef<typeof features, IssuanceNormHeaderExpanded, unknown>> = [
     {
         accessorKey: "position",
         header: "Должность",
-        cell: ({ row }) =>
-            row.original.expand?.position?.name ?? "Не указана",
+        cell: ({ row }) => row.original.expand?.position?.name ?? "Не указана",
     },
     {
-        accessorKey: "nomenclature",
-        header: "Наименование СИЗ",
-        cell: ({ row }) =>
-            row.original.expand?.nomenclature?.name ?? "Не указано",
+        accessorKey: "name",
+        header: "Название нормы",
+        cell: ({ row }) => row.original.name,
     },
     {
-        accessorKey: "quantity",
-        header: "Количество",
-        cell: (info) => info.getValue(),
+        accessorKey: "condition",
+        header: "Условие нормы",
+        cell: ({ row }) => row.original.condition || "—",
     },
     {
-        accessorKey: "period_months",
-        header: "Период, мес.",
-        cell: (info) => info.getValue(),
-    },
-    {
-        accessorKey: "estimated_cost",
-        header: "Расчётная стоимость",
-        cell: (info) => info.getValue(),
+        accessorKey: "norm_point",
+        header: "Пункт норм",
+        cell: ({ row }) => row.original.norm_point || "—",
     },
     {
         accessorKey: "comment",
         header: "Комментарий",
-        cell: (info) => info.getValue(),
+        cell: ({ row }) => row.original.comment || "—",
     },
-]
+];
 
 export const IssuanceNormsTable = () => {
 
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
-    const [issuanceNorms, setIssuanceNorms] = useState<Array<IssuanceNormExpanded>>([])
+    const [issuanceNorms, setIssuanceNorms] = useState<Array<IssuanceNormHeaderExpanded>>([])
     const [selectedIssuanceNormId, setSelectedIssuanceNormId] = useState<string | null>(null);
 
     const handleClick = (id: string | null) => {
@@ -73,11 +66,11 @@ export const IssuanceNormsTable = () => {
 
     const loadIssuanceNorms = async ()  => {
         try {
-            const data = await getIssuanceNorms()
+            const data = await getIssuanceNormHeaders()
             setIssuanceNorms(data)
         } catch (error) {
             console.error('Ошибка загрузки сотрудников:', error);
-            message.warning('Включен Strict mode: Сотрудники');
+            message.warning('Включен Strict mode: Нормы выдачи');
         }
     }
 

@@ -5,11 +5,13 @@ import {
     filterFn_includesString,
     tableFeatures, useTable
 } from "@tanstack/react-table";
-import type {IssuanceNormExpanded} from "../../types/norms.ts";
-import {useEffect, useState} from "react";
-import {deleteIssuanceNorm, getIssuanceNorm} from "../../hooks/useIssuanceNorms.tsx";
-import {Button, type CheckboxProps, Input, message} from "antd";
+import type {IssuanceNormExpanded, IssuanceNormHeaderExpanded} from "../../types/norms.ts";
+import {useCallback, useEffect, useState} from "react";
+import {deleteIssuanceNorm, getIssuanceNormItems} from "../../hooks/useIssuanceNorms.tsx";
+import {Button, type CheckboxProps, Divider, Input, message} from "antd";
 import Checkbox from "antd/es/checkbox/Checkbox";
+import {IssuanceNormRecordModal} from "./createModal/IssuanceNormRecordModal.tsx";
+import Text from "antd/es/typography/Text";
 
 
 const features = tableFeatures({
@@ -24,7 +26,7 @@ const features = tableFeatures({
 
 
 type IssuanceNormRecordTableProps = {
-    issuanceNorm: IssuanceNormExpanded | undefined;
+    issuanceNorm: IssuanceNormHeaderExpanded | undefined;
 }
 
 export const IssuanceNormRecordTable = ({issuanceNorm}: IssuanceNormRecordTableProps) => {
@@ -39,13 +41,11 @@ export const IssuanceNormRecordTable = ({issuanceNorm}: IssuanceNormRecordTableP
         } else {
             setSelectedIds(prev => prev.filter(selectetId => selectetId !== id))
         }
-
-        console.log(selectedIds)
     }
 
     const columns: Array<ColumnDef<typeof features, IssuanceNormExpanded, unknown>> = [
         {
-            accessorKey: "id",
+            accessorKey: "create",
             header: "Чекбокс",
             cell: ({row}) => {
                 const id = row.original.id
@@ -59,10 +59,11 @@ export const IssuanceNormRecordTable = ({issuanceNorm}: IssuanceNormRecordTableP
 
         },
         {
-            accessorKey: "nomenclature",
-            header: "Наименование СИЗ",
-            cell: ({ row }) =>
-                row.original.expand?.nomenclature?.name ?? "Не указано",
+            id: 'nomenclature',
+            accessorFn: (row) => row.expand?.nomenclature?.name ?? '',
+            header: 'Наименование СИЗ',
+            filterFn: 'includesString',
+            cell: ({ row }) => row.original.expand?.nomenclature?.name ?? 'Не указано',
         },
         {
             accessorKey: "quantity",
@@ -86,44 +87,56 @@ export const IssuanceNormRecordTable = ({issuanceNorm}: IssuanceNormRecordTableP
         },
     ]
 
-
-    const loadIssuanceNorms = async ()  => {
-        if(issuanceNorm === undefined) return
+    const loadIssuanceNorms = useCallback(async () => {
+        if (!issuanceNorm?.id) {
+            setIssuanceNorms([]);
+            return;
+        }
 
         try {
-            const data = await getIssuanceNorm(issuanceNorm.position)
-            setIssuanceNorms(data)
+            console.log("ID выбранной нормы:", issuanceNorm.id);
+            const data = await getIssuanceNormItems(issuanceNorm.id);
+            console.log("Данные для таблицы:", data);
+            setIssuanceNorms(data);
         } catch (error) {
-            console.error('Ошибка загрузки сотрудников:', error);
-            message.warning('Включен Strict mode: Сотрудники');
+            console.error('Ошибка загрузки записей нормы:', error);
+            message.error('Не удалось загрузить записи нормы');
+            setIssuanceNorms([]);
         }
-    }
+    }, [issuanceNorm?.id]);
+
+    useEffect(() => {
+        setSelectedIds([]);
+        setColumnFilters([]);
+        void loadIssuanceNorms();
+    }, [loadIssuanceNorms]);
+
+
 
     const handleDeleteIssuanceNorm = async (ids: string[]) => {
         if(ids.length === 0){
             message.warning('Выбери записи для удаления')
+            setSelectedIds([])
             return
         }
 
         try {
             for (const id of ids) {
-                await deleteIssuanceNorm(id)
+                await deleteIssuanceNorm(id);
             }
 
             message.success("Выбранные записи удалены");
-
-            await loadIssuanceNorms()
-            setSelectedIds([])
         } catch (error) {
-            message.error("Ошибка удаления записей")
+            console.error("Ошибка удаления записей:", error);
+            message.error("Не удалось удалить все выбранные записи");
+        } finally {
+            setSelectedIds([]);
             await loadIssuanceNorms();
         }
 
     }
 
-    useEffect(() => {
-        loadIssuanceNorms()
-    }, [issuanceNorm]);
+
 
     const table = useTable({
         key: 'IssuanceNorms-table',
@@ -149,6 +162,35 @@ export const IssuanceNormRecordTable = ({issuanceNorm}: IssuanceNormRecordTableP
 
     return (
         <div>
+            <div className={'grid grid-cols-2 gap-4'}>
+                <div className={'flex flex-col'}>
+                    <Text strong>Наименование нормы</Text>
+                    <Text>{issuanceNorm?.name}</Text>
+                </div>
+                <div className={'flex flex-col'}>
+                    <Text strong>Период</Text>
+                    <Text>{issuanceNorm?.period_months}</Text>
+                </div>
+                <div className={'flex flex-col'}>
+                    <Text strong>Подразделение</Text>
+                    <Text>{issuanceNorm?.expand?.position?.name}</Text>
+                </div>
+                <div className={'flex flex-col'}>
+                    <Text strong>Условие нормы</Text>
+                    <Text>{issuanceNorm?.condition}</Text>
+                </div>
+                <div className={'flex flex-col'}>
+                    <Text strong>Пункт норм</Text>
+                    <Text>{issuanceNorm?.norm_point}</Text>
+                </div>
+                <div className={'flex flex-col'}>
+                    <Text strong>Комментарий</Text>
+                    <Text>{issuanceNorm?.comment}</Text>
+                </div>
+            </div>
+
+            <Divider/>
+
             <Input
                 onChange={handleSearchChange}
                 className={'m-3 w-102'}
@@ -187,8 +229,13 @@ export const IssuanceNormRecordTable = ({issuanceNorm}: IssuanceNormRecordTableP
                 </table>
             </div>
             <div className={'flex flex-row gap-3'}>
-                <Button variant={'outlined'} color={'blue'}>Добавить</Button>
-                <Button onClick={() => handleDeleteIssuanceNorm(selectedIds)} danger>Удалить</Button>
+                <IssuanceNormRecordModal issuanceNorm={issuanceNorm}/>
+                <Button
+                    onClick={() => handleDeleteIssuanceNorm(selectedIds)}
+                    danger
+                >
+                    Удалить
+                </Button>
             </div>
         </div>
     )

@@ -6,11 +6,11 @@ import {
     type GetProp,
 } from "antd";
 import {createStaticStyles} from "antd-style";
-import type {IssuanceNorm, IssuanceNormExpanded} from "../../types/norms.ts";
+import type {IssuanceNormHeaderExpanded} from "../../types/norms.ts";
 import {IssuanceNormTabs} from "./IssuanceNormTabs.tsx";
 
 
-const sharedContent = (issuanceNorm: IssuanceNormExpanded | undefined) => {
+const sharedContent = (issuanceNorm: IssuanceNormHeaderExpanded | undefined) => {
 
     return (
         <>
@@ -49,7 +49,7 @@ const stylesFn: DrawerProps['styles'] = (info): GetProp<DrawerProps, 'styles', '
 type SelectProp = {
     selectedIssuanceNormId: string | null;
     onClose: () => void;
-    issuanceNorm: IssuanceNorm | undefined;
+    issuanceNorm: IssuanceNormHeaderExpanded | undefined;
 }
 
 
@@ -65,13 +65,13 @@ export const IssuanceNormRecord = ({selectedIssuanceNormId, onClose, issuanceNor
                 styles={{ root: { borderColor: '#ccc', color: '#171717', backgroundColor: '#fff' } }}
                 onClick={onClose}
             >
-                Cancel
+                Отмена
             </Button>
             <Button
                 type="primary"
                 styles={{ root: { backgroundColor: '#171717' } }}
             >
-                Submit
+                Сохранить
             </Button>
         </Flex>
     );
@@ -80,7 +80,7 @@ export const IssuanceNormRecord = ({selectedIssuanceNormId, onClose, issuanceNor
         <Drawer
             {...sharedProps}
             footer={footer}
-            title={'Карточка нормы'}
+            title={issuanceNorm?.expand?.position?.name ?? "Карточка нормы"}
             styles={stylesFn}
             mask={{ enabled: true, blur: true }}
             open={selectedIssuanceNormId !== null}
