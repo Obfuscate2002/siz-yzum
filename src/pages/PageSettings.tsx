@@ -1,6 +1,7 @@
 import {ImportPositions} from "../components/settings/ImportPositions.tsx";
 import {Typography} from "antd";
 import {MigrateEmployeePositions} from "../components/settings/MigrateEmployeePositions.tsx";
+import {MigratePositions} from "../components/settings/MigratePositions.tsx";
 
 export const PageSettings = () => {
 
@@ -19,6 +20,12 @@ export const PageSettings = () => {
                     <br/>
                     <MigrateEmployeePositions/>
                 </div>
+                <div>
+                    <label>Кнопка миграции</label>
+                    <br/>
+                    <MigratePositions/>
+                </div>
+
 
             </div>
         </div>

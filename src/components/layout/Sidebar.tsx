@@ -7,7 +7,6 @@ import {
     UserOutlined
 } from "@ant-design/icons";
 import {useLocation, useNavigate} from "react-router";
-
 type MenuItem = Required<MenuProps>['items'][number];
 
 function getItem(
@@ -30,6 +29,7 @@ const items: MenuItem[] = [
     getItem('СИЗ', 'ppe', <SafetyOutlined />),
     getItem('Справочник видов норм', 'norms_catalog', <CheckSquareOutlined />),
     getItem('Нормы выдачи', 'issuance_norms'),
+    getItem('Справочник норм СИЗ', 'ppeIssuanceStandards'),
     getItem('Настройки', 'settings', <SettingOutlined />),
 ];
 
