@@ -2,6 +2,7 @@ import {ImportPositions} from "../components/settings/ImportPositions.tsx";
 import {Typography} from "antd";
 import {MigrateEmployeePositions} from "../components/settings/MigrateEmployeePositions.tsx";
 import {MigratePositions} from "../components/settings/MigratePositions.tsx";
+import {MatchPositions} from "../components/util/MatchPositions.tsx";
 
 export const PageSettings = () => {
 
@@ -25,6 +26,10 @@ export const PageSettings = () => {
                     <br/>
                     <MigratePositions/>
                 </div>
+                <div>
+                    <MatchPositions/>
+                </div>
+
 
 
             </div>

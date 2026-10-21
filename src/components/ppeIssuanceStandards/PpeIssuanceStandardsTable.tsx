@@ -36,14 +36,14 @@ export const PpeIssuanceStandardsTable = () => {
     const [ppeIssuanceStandards, setPpeIssuanceStandards] = useState<Array<PpeIssuanceStandard>>([])
     const [selectedPpeIssuanceStandardId, setSelectedPpeIssuanceStandardId] = useState<string | null>(null);
 
-    const uniquePositions: PpeIssuanceStandard[] = Array.from(
-        new Map(
-            ppeIssuanceStandards.map((item) => [
-                item.position_name?.trim().toLowerCase(),
-                item
-            ])
-        ).values()
-    );
+    // const uniquePositions: PpeIssuanceStandard[] = Array.from(
+    //     new Map(
+    //         ppeIssuanceStandards.map((item) => [
+    //             item.position_name?.trim().toLowerCase(),
+    //             item
+    //         ])
+    //     ).values()
+    // );
 
     const handleClick = (id: string | null) => {
         setSelectedPpeIssuanceStandardId(id);
@@ -69,7 +69,7 @@ export const PpeIssuanceStandardsTable = () => {
         key: 'ppeIssuanceStandards-table',
         features,
         columns,
-        data: uniquePositions,
+        data: ppeIssuanceStandards,
         state: {
             columnFilters
         },

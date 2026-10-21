@@ -1,5 +1,6 @@
 
 
+
 export interface PpeIssuanceStandard {
     id: string;
     ppe_type: string;
@@ -9,4 +10,14 @@ export interface PpeIssuanceStandard {
     position_name: string;
     created: string;
     updated: string;
+}
+
+
+export interface PpeIssuanceStandardExpanded extends PpeIssuanceStandard {
+    expand?: {
+        position?: {
+            id: string;
+            name: string;
+        }
+    }
 }
