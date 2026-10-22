@@ -11,7 +11,7 @@ import {Input, message} from "antd";
 import {getPpeIssuanceStandards} from "../../hooks/usePpeIssuanceStandards.tsx";
 import type {PpeIssuanceStandard} from "../../types/ppeIssuanceStandards.ts";
 import {PpeIssuanceStandardRecord} from "./PpeIssuanceStandardRecord.tsx";
-import {ImportPpeIssuanceStandards} from "./ImportPpeIssuanceStandard.tsx";
+
 import {PpeIssuanceStandardModal} from "./PpeIssuanceStandardModal.tsx";
 
 const features = tableFeatures({
@@ -24,26 +24,21 @@ const features = tableFeatures({
 
 const columns: Array<ColumnDef<typeof features, PpeIssuanceStandard, unknown>> = [
     {
-        accessorKey: 'position_name',
+        accessorKey: 'position',
         header: 'Должность',
         cell: (info) => info.getValue(),
     },
 
 ]
 
+function ImportPpeIssuanceStandards() {
+    return null;
+}
+
 export const PpeIssuanceStandardsTable = () => {
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
     const [ppeIssuanceStandards, setPpeIssuanceStandards] = useState<Array<PpeIssuanceStandard>>([])
     const [selectedPpeIssuanceStandardId, setSelectedPpeIssuanceStandardId] = useState<string | null>(null);
-
-    // const uniquePositions: PpeIssuanceStandard[] = Array.from(
-    //     new Map(
-    //         ppeIssuanceStandards.map((item) => [
-    //             item.position_name?.trim().toLowerCase(),
-    //             item
-    //         ])
-    //     ).values()
-    // );
 
     const handleClick = (id: string | null) => {
         setSelectedPpeIssuanceStandardId(id);

@@ -1,8 +1,8 @@
-import {ImportPositions} from "../components/settings/ImportPositions.tsx";
 import {Typography} from "antd";
-import {MigrateEmployeePositions} from "../components/settings/MigrateEmployeePositions.tsx";
-import {MigratePositions} from "../components/settings/MigratePositions.tsx";
-import {MatchPositions} from "../components/util/MatchPositions.tsx";
+import {ClearPpeStandardsButton} from "../components/positions/ClearPpeIssuanceStandard.tsx";
+import {pb} from "../pocketbase/pocketbase.ts";
+import {RemovePpeDuplicatesButton} from "../components/positions/RemovePpeDuplicatesButton.tsx";
+import {ExportPpeStandardsButton} from "../components/positions/ExportPpeStandardsButton.tsx";
 
 export const PageSettings = () => {
 
@@ -14,24 +14,29 @@ export const PageSettings = () => {
                 <div>
                     <label>Кнопка импорта должностей из eployees.position в position.name</label>
                     <br/>
-                    <ImportPositions/>
+                    {/*<ImportPositions/>*/}
                 </div>
                 <div>
                     <label>Кнопка миграции eployees.position (текст) в employees.positionRelation (поле содержит ссылку на positions.name)</label>
                     <br/>
-                    <MigrateEmployeePositions/>
+                    {/*<MigrateEmployeePositions/>*/}
                 </div>
                 <div>
                     <label>Кнопка миграции</label>
                     <br/>
-                    <MigratePositions/>
+                    {/*<MigratePositions/>*/}
                 </div>
                 <div>
-                    <MatchPositions/>
+                    {/*<MatchPositions/>*/}
                 </div>
-
-
-
+                <div className={'border border-gray-400 rounded-md'}>
+                    <Typography.Title className={'m-3'} level={3}>Обработки: справочник норм СИЗ</Typography.Title>
+                    <div className={'flex flex-row gap-3 m-3'}>
+                        <ClearPpeStandardsButton pb={pb}/>
+                        <RemovePpeDuplicatesButton pb={pb}/>
+                        <ExportPpeStandardsButton pb={pb}/>
+                    </div>
+                </div>
             </div>
         </div>
     )
