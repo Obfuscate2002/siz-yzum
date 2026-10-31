@@ -8,6 +8,7 @@ import {PageDashboard} from "./pages/PageDashboard.tsx";
 import {PageIssuanceNorms} from "./pages/PageIssuanceNorms.tsx";
 import { PageSettings } from './pages/PageSettings.tsx';
 import {PagePpeIssuanceStandards} from "./pages/PagePpeIssuanceStandards.tsx";
+import {PageOfDepartaments} from "./pages/PageOfDepartaments.tsx";
 
 
 function App() {
@@ -23,6 +24,8 @@ function App() {
                 <Route path={'ppe'} element={<PagePpes/>}/>
                 <Route path={'ppeIssuanceStandards'} element={<PagePpeIssuanceStandards/>}/>
                 <Route path={'settings'} element={<PageSettings/>}/>
+                <Route path={'divisions'} element={<PageOfDepartaments/>}/>
+
             </Route>
         </Routes>
 

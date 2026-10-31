@@ -3,6 +3,10 @@ import {ClearPpeStandardsButton} from "../components/positions/ClearPpeIssuanceS
 import {pb} from "../pocketbase/pocketbase.ts";
 import {RemovePpeDuplicatesButton} from "../components/positions/RemovePpeDuplicatesButton.tsx";
 import {ExportPpeStandardsButton} from "../components/positions/ExportPpeStandardsButton.tsx";
+import {ImportDivisions} from "../components/settings/ImportDivisions.tsx";
+import {ImportContractPositions} from "../components/settings/ImportContractPositions.tsx";
+import UpdateDivisionRelations from "../components/settings/UpdateDivisionRelations.tsx";
+import ImportPpePositions from "../components/settings/ImportPpePositions.tsx";
 
 export const PageSettings = () => {
 
@@ -10,7 +14,7 @@ export const PageSettings = () => {
         <div className={'flex flex-col gap-5'}>
             <Typography.Title level={2} className={'text-red-500'}>ИСПОЛЬЗОВАНИЕ ФУНКЦИОНАЛА ДАННОГО РАЗДЕЛА ЗАПРЕЩЕНО ПОЛЬЗОВАТЕЛЯМ!!!</Typography.Title>
             <Typography.Text strong className={'text-xl'}>Если вы видите эту страницу, значит права доступа не настроены</Typography.Text>
-            <div className={'grid grid-cols-3'}>
+            <div className={'grid grid-cols-1 gap-4'}>
                 <div>
                     <label>Кнопка импорта должностей из eployees.position в position.name</label>
                     <br/>
@@ -37,6 +41,25 @@ export const PageSettings = () => {
                         <ExportPpeStandardsButton pb={pb}/>
                     </div>
                 </div>
+                <div className={'flex flex-col'}>
+                    <span>Блок </span>
+                    <div>
+                        Импорт должностей из файла
+                        <ImportDivisions pb={pb}/>
+                    </div>
+                    <div>
+                        Импорт должностей по нормам СИЗ
+                        <ImportPpePositions pb={pb}/>
+                    </div>
+                    <div>
+                        Импорт должностей по трудовому договору
+                        <ImportContractPositions pb={pb} />
+                    </div>
+                    <div>
+                        <UpdateDivisionRelations pb={pb}/>
+                    </div>
+                </div>
+
             </div>
         </div>
     )

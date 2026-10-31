@@ -30,7 +30,9 @@ const items: MenuItem[] = [
     getItem('Справочник видов норм', 'norms_catalog', <CheckSquareOutlined />),
     getItem('Нормы выдачи', 'issuance_norms'),
     getItem('Справочник норм СИЗ', 'ppeIssuanceStandards'),
+    getItem('Справочник подразделений', 'divisions'),
     getItem('Настройки', 'settings', <SettingOutlined />),
+
 ];
 
 export const Sidebar = () => {

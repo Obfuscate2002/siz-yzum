@@ -4,7 +4,7 @@ import {HeaderLayout} from "./Header.tsx";
 import {Outlet, useLocation} from "react-router";
 const {Content, Footer} = Layout;
 
-type PagePath = '/employees' | '/ppe' | '/norms' | '/dashboard' | '/settings' | '/norms_catalog' | '/issuance_norms' | '/ppeIssuanceStandards';
+type PagePath = '/employees' | '/ppe' | '/norms' | '/dashboard' | '/settings' | '/norms_catalog' | '/issuance_norms' | '/ppeIssuanceStandards' | '/divisions';
 
 const AppLayout: React.FC = () => {
 
@@ -20,6 +20,7 @@ const AppLayout: React.FC = () => {
         '/issuance_norms': 'Нормы выдачи',
         '/ppeIssuanceStandards': 'Справочник норм СИЗ',
         '/settings': 'Настройки',
+        '/divisions': 'Справочник подразделений'
 
     };
 
