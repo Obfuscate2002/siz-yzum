@@ -7,6 +7,7 @@ import {ImportDivisions} from "../components/settings/ImportDivisions.tsx";
 import {ImportContractPositions} from "../components/settings/ImportContractPositions.tsx";
 import UpdateDivisionRelations from "../components/settings/UpdateDivisionRelations.tsx";
 import ImportPpePositions from "../components/settings/ImportPpePositions.tsx";
+import {LinkEmployeeRelations} from "../components/settings/LinkEmployeeRelations.tsx";
 
 export const PageSettings = () => {
 
@@ -57,6 +58,10 @@ export const PageSettings = () => {
                     </div>
                     <div>
                         <UpdateDivisionRelations pb={pb}/>
+                    </div>
+                    <div>
+                        Отдельная кнопка
+                        <LinkEmployeeRelations pb={pb}/>
                     </div>
                 </div>
 

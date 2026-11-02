@@ -9,6 +9,7 @@ export interface Employees {
 
     departmentRef: string;
     positionRelation: string;
+    contractPosition: string;
 
     height: number;
     clothingSize: string;
@@ -19,6 +20,10 @@ export interface Employees {
     updated: string;
     expand?: {
         positionRelation?: {
+            id: string
+            name: string
+        },
+        contractPosition?: {
             id: string
             name: string
         }

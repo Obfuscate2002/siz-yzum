@@ -38,9 +38,15 @@ const columns: Array<ColumnDef<typeof features, Employees, unknown>> = [
     },
     {
         accessorKey: 'positionRelation',
-        header: 'Должность',
+        header: 'Должность по СИЗ',
         cell: ({row}) =>
             row.original.expand?.positionRelation?.name ?? 'Не указана'
+    },
+    {
+        accessorKey: 'contractPosition',
+        header: 'Должность по трудовому',
+        cell: ({row}) =>
+        row.original.expand?.contractPosition?.name ?? 'Не указана',
     },
     {
         accessorKey: 'unit',
