@@ -1,9 +1,13 @@
-import {Form, type FormInstance, Input, message} from "antd";
+import {Form, type FormInstance, Input, message, Select} from "antd";
 import {pb} from "../../pocketbase/pocketbase.ts";
+import type {Division} from "../../types/divisions.ts";
+import type {ContractPosition} from "../../types/contractPositions.ts";
 
-interface Props {
+interface EmployeesForm {
     form: FormInstance,
     onSuccess?: () => void,
+    allDivisions: Division[],
+    allContractPositions: ContractPosition[],
 }
 
 type DataProps = {
@@ -14,7 +18,7 @@ type DataProps = {
     personnelNumber: string,
 }
 
-export const EmployeesForm = ({form, onSuccess}: Props) => {
+export const EmployeesForm = ({form, onSuccess, allDivisions, allContractPositions}: EmployeesForm) => {
    const handleSubmit = async (values: DataProps) => {
        try {
            await pb.collection('employees').create({
@@ -35,14 +39,30 @@ export const EmployeesForm = ({form, onSuccess}: Props) => {
            <Form.Item name='fullName' label='ФИО' rules={[{required: true, message: 'Введите ФИО сотрудника'}]}>
                <Input/>
            </Form.Item>
-           <Form.Item name='position' label='Должность' rules={[{required: false}]}>
+           <Form.Item name='contractPosition' label='Должность по трудовому договору' rules={[{required: true, message: 'Заполните поле'}]}>
+               <Select
+                    placeholder='Выберите должность'
+                    options={allContractPositions.map((item) => ({
+                        label: item.name,
+                        value: item.id
+                    }))}
+               />
+           </Form.Item>
+           <Form.Item name='division' label='Подразделение' rules={[{required: true, message: 'Заполните поле'}]}>
+               <Select
+                   placeholder='Выберите подразделение'
+                   options={allDivisions.map((item) => ({
+                       label: item.name,
+                       value: item.id,
+                   }))}
+
+               />
+           </Form.Item>
+           <Form.Item name='personnelNumber' label='Табельный номер:' rules={[{required: true, message: 'Заполните табельный номер'}]}>
                <Input/>
            </Form.Item>
-           <Form.Item name='unit' label='Подразделение' rules={[{required: false}]}>
-               <Input/>
-           </Form.Item>
-           <Form.Item initialValue='11556-123' name='personnelNumber' label='Таб №.' rules={[{required: false}]}>
-               <Input/>
+           <Form.Item name='comment' label='Комментарий:' rules={[{required: false}]}>
+               <Input.TextArea/>
            </Form.Item>
        </Form>
    )

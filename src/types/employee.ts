@@ -1,5 +1,5 @@
 
-export interface Employees {
+export interface Employee {
     id: string;
     fullName: string;
     position: string;
@@ -24,6 +24,10 @@ export interface Employees {
             name: string
         },
         contractPosition?: {
+            id: string
+            name: string
+        },
+        division?: {
             id: string
             name: string
         }

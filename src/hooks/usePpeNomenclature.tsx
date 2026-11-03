@@ -13,7 +13,6 @@ type PpeNomenclature = {
 };
 
 export const getPpeNomenclatures = async (): Promise<PpeNomenclature[]> => {
-    await pb.collection('users').authWithPassword('admin@siz-yzum.local', 'siz-yzum2026');
     const data = await pb.collection('siz_nomenclature').getFullList<PpeNomenclature>();
     return data;
 }

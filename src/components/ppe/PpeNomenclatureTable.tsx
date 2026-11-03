@@ -107,7 +107,7 @@ export const PpeNomenclatureTable = () => {
 
     return (
         <div>
-            <PpeNomenclaturesModal loadPpeNomenclatures={loadPpeNomenclatures}/>
+            <PpeNomenclaturesModal/>
             <Input
                 onChange={handleSearchChange}
                 className={'m-3 w-102'}

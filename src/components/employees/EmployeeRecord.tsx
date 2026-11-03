@@ -14,10 +14,11 @@ import {
 import {createStaticStyles} from "antd-style";
 import Text from "antd/es/typography/Text";
 import {EmployeeRecordTable} from "./EmployeeRecordTable.tsx";
-import type {Employees} from "../../types/employee.ts";
+import type {Employee} from "../../types/employee.ts";
+import {useState} from "react";
 
 
-const headerText = (employee: Employees | undefined) => {
+const headerText = (employee: Employee | undefined) => {
     return (
         <div className={'flex flex-col'}>
 
@@ -34,46 +35,100 @@ const headerText = (employee: Employees | undefined) => {
     )
 }
 
-const sharedContent = (employee: Employees | undefined) => {
+interface SharedContentProps {
+    employee?: Employee;
+    isEdit: boolean;
+    setEdit: (value: boolean) => void;
+}
+
+const SharedContent = ({employee, isEdit, setEdit}: SharedContentProps) => {
+
+    const handleStartEdit = () => {
+        setEdit(true);
+    }
 
     return (
         <>
         <Typography.Title level={3}>
             Данные сотрудника:
         </Typography.Title>
-            <div className={'grid grid-cols-2 gap-4'}>
-                <div className={'flex flex-col'}>
-                    <Text strong>ФИО</Text>
-                    <Text>{employee?.fullName}</Text>
+            <Divider/>
+            {isEdit ? (
+                <>
+                    <Form layout={"vertical"}>
+                        <div className={'grid grid-cols-2 gap-4'}>
+                            <Form.Item label={'Фио'} name={'fullName'}>
+                                <Input/>
+                            </Form.Item>
+                            <Form.Item label={'Должность'} name={'position'}>
+                                <Input/>
+                            </Form.Item>
+                            <Form.Item label={'Подразделение'} name={'unit'}>
+                                <Input/>
+                            </Form.Item>
+                            <Form.Item label={'Табельный номер'} name={'personnelNumber'}>
+                                <InputNumber/>
+                            </Form.Item>
+                            <Form.Item label={'height'} name={'height'}>
+                                <Input/>
+                            </Form.Item>
+                            <Form.Item label={'clothingSize'} name={'clothingSize'}>
+                                <Input/>
+                            </Form.Item>
+                            <Form.Item label={'shoeSize'} name={'shoeSize'}>
+                                <Input/>
+                            </Form.Item>
+                            <Form.Item label={'comment'} name={'comment'}>
+                                <Input.TextArea/>
+                            </Form.Item>
+                        </div>
+
+                        <div className={'flex flex-row justify-end gap-1'}>
+                            <Button onClick={() => setEdit(false)}>Отмена</Button>
+                            <Button>Сохранить</Button>
+                        </div>
+                    </Form>
+                </>
+            ) : (
+                <div className={'grid grid-cols-2 gap-4'}>
+                    <div className={'flex flex-col'}>
+                        <Text strong>ФИО</Text>
+                        <Text>{employee?.fullName}</Text>
+                    </div>
+                    <div className={'flex flex-col'}>
+                        <Text strong>Должность</Text>
+                        <Text>{employee?.position}</Text>
+                    </div>
+                    <div className={'flex flex-col'}>
+                        <Text strong>Подразделение</Text>
+                        <Text>{employee?.unit}</Text>
+                    </div>
+                    <div className={'flex flex-col'}>
+                        <Text strong>Рост</Text>
+                        <Text>{employee?.height}</Text>
+                    </div>
+                    <div className={'flex flex-col'}>
+                        <Text strong>Размер одежды</Text>
+                        <Text>{employee?.clothingSize}</Text>
+                    </div>
+                    <div className={'flex flex-col'}>
+                        <Text strong>Размер обуви</Text>
+                        <Text>{employee?.shoeSize}</Text>
+                    </div>
+                    <div className={'flex flex-col'}>
+                        <Text strong>Комментарий</Text>
+                        <Text>{employee?.comment === '' ? '-' :employee?.comment}</Text>
+                    </div>
+                    <div className={'flex justify-end'}>
+                        <Button
+                            onClick={() => {handleStartEdit()}}
+                            className={'m-1'}
+                        >
+                            Редактировать
+                        </Button>
+                    </div>
                 </div>
-                <div className={'flex flex-col'}>
-                    <Text strong>Должность</Text>
-                    <Text>{employee?.position}</Text>
-                </div>
-                <div className={'flex flex-col'}>
-                    <Text strong>Подразделение</Text>
-                    <Text>{employee?.unit}</Text>
-                </div>
-                <div className={'flex flex-col'}>
-                    <Text strong>Рост</Text>
-                    <Text>{employee?.height}</Text>
-                </div>
-                <div className={'flex flex-col'}>
-                    <Text strong>Размер одежды</Text>
-                    <Text>{employee?.clothingSize}</Text>
-                </div>
-                <div className={'flex flex-col'}>
-                    <Text strong>Размер обуви</Text>
-                    <Text>{employee?.shoeSize}</Text>
-                </div>
-                <div className={'flex flex-col'}>
-                    <Text strong>Комментарий</Text>
-                    <Text>{employee?.comment === '' ? '-' :employee?.comment}</Text>
-                </div>
-            </div>
-            <div className={'flex justify-end'}>
-                <Button className={' m-1'}>Редактировать</Button>
-            </div>
+            )}
             <Divider/>
             <Typography.Title level={3}>
                 Нормы выдачи СИЗ:
@@ -81,32 +136,8 @@ const sharedContent = (employee: Employees | undefined) => {
 
             <EmployeeRecordTable positionId={employee?.positionRelation}/>
 
-            <Form layout={"vertical"}>
-                <Form.Item label={'Фио'} name={'fullName'}>
-                    <Input/>
-                </Form.Item>
-                <Form.Item label={'Должность'} name={'position'}>
-                    <Input/>
-                </Form.Item>
-                <Form.Item label={'Подразделение'} name={'unit'}>
-                    <Input/>
-                </Form.Item>
-                <Form.Item label={'Табельный номер'} name={'personnelNumber'}>
-                    <InputNumber/>
-                </Form.Item>
-                <Form.Item label={'height'} name={'height'}>
-                    <Input/>
-                </Form.Item>
-                <Form.Item label={'clothingSize'} name={'clothingSize'}>
-                    <Input/>
-                </Form.Item>
-                <Form.Item label={'shoeSize'} name={'shoeSize'}>
-                    <Input/>
-                </Form.Item>
-                <Form.Item label={'comment'} name={'comment'}>
-                    <Input.TextArea/>
-                </Form.Item>
-            </Form>
+
+
         </>
     );
 }
@@ -143,10 +174,17 @@ const stylesFn: DrawerProps['styles'] = (info): GetProp<DrawerProps, 'styles', '
 type SelectProp = {
     selectedEmployeeId: string | null;
     onClose: () => void;
-    employee: Employees | undefined;
+    employee: Employee | undefined;
 }
 
 export const EmployeeRecord = ({selectedEmployeeId, onClose, employee}: SelectProp) => {
+    const [isEdit, setEdit] = useState(false);
+
+    const handleClose = () => {
+        setEdit(false);
+        onClose();
+    }
+
     const sharedProps: DrawerProps = {
         classNames,
         size: 800,
@@ -156,7 +194,7 @@ export const EmployeeRecord = ({selectedEmployeeId, onClose, employee}: SelectPr
         <Flex gap="medium" justify="flex-end">
             <Button
                 styles={{ root: { borderColor: '#ccc', color: '#171717', backgroundColor: '#fff' } }}
-                onClick={onClose}
+                onClick={handleClose}
             >
                 Cancel
             </Button>
@@ -178,10 +216,13 @@ export const EmployeeRecord = ({selectedEmployeeId, onClose, employee}: SelectPr
             styles={stylesFn}
             mask={{ enabled: true, blur: true }}
             open={selectedEmployeeId !== null}
-            onClose={onClose}
+            onClose={handleClose}
             closable={false}
         >
-            {sharedContent(employee)}
+            <SharedContent
+                employee={employee}
+                isEdit={isEdit}
+                setEdit={setEdit}/>
         </Drawer>
     )
 

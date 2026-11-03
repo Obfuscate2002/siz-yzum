@@ -107,7 +107,7 @@ export const NormsTable = ()=>{
 
     return (
         <div>
-            <NormsModal loadPpeItems={loadNorms}/>
+            <NormsModal/>
             <Input
                 onChange={handleSearchChange}
                 className={'m-3 w-102'}

@@ -92,7 +92,7 @@ export const PpeIssuanceStandardsTable = () => {
                 onClose={onClose}
                 ppeIssuanceStandard={ppeIssuanceStandard}
             />
-            <PpeIssuanceStandardModal loadPpeIssuanceStandards={loadPpeIssuanceStandards}/>
+            <PpeIssuanceStandardModal/>
             <Input
                 onChange={handleSearchChange}
                 className={'m-3 w-102'}

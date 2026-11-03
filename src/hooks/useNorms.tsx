@@ -12,7 +12,6 @@ type PppeItem = {
 }
 
 export const getNorms = async (): Promise<PppeItem[]> => {
-    await pb.collection('users').authWithPassword('admin@siz-yzum.local', 'siz-yzum2026');
     const data = await pb.collection('norms_catalog').getFullList<PppeItem>();
     return data;
 }

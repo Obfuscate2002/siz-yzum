@@ -11,7 +11,6 @@ export const getIssuanceNorms = async (): Promise<IssuanceNormExpanded[]> => {
 }
 
 export const getIssuanceNorm = async (positionId: string): Promise<IssuanceNormExpanded[]> => {
-    await pb.collection('users').authWithPassword('admin@siz-yzum.local', 'siz-yzum2026');
     const data = await pb.collection('issuance_norms').getFullList<IssuanceNormExpanded>({
         filter: `position = "${positionId}"`,
         expand: "nomenclature,position",
@@ -21,7 +20,6 @@ export const getIssuanceNorm = async (positionId: string): Promise<IssuanceNormE
 
 //////////////////////////////////////////////////////////// новые
 export const getIssuanceNormHeaders = async (): Promise<IssuanceNormHeaderExpanded[]> => {
-    await pb.collection('users').authWithPassword('admin@siz-yzum.local', 'siz-yzum2026');
     return await pb
         .collection("issuance_norm_headers")
         .getFullList<IssuanceNormHeaderExpanded>({
@@ -45,7 +43,6 @@ export const getIssuanceNormItems = async (
 
 
 export const deleteIssuanceNorm = async (id: string): Promise<void> => {
-    await pb.collection('users').authWithPassword('admin@siz-yzum.local', 'siz-yzum2026');
     await pb.collection("issuance_norms").delete(id);
 };
 

@@ -3,10 +3,10 @@ import { createStaticStyles } from 'antd-style';
 import {useState} from "react";
 import {EmployeesForm} from "./EmployeesForm.tsx";
 import {PlusCircleOutlined} from "@ant-design/icons";
+import type {ContractPosition} from "../../types/contractPositions.ts";
+import type {Division} from "../../types/divisions.ts";
 
-interface EmployeeModalProps  {
-    loadEmployees: () => Promise<void>;
-}
+
 
 const classNames = createStaticStyles(({ css }) => ({
     container: css`
@@ -39,7 +39,13 @@ const stylesFn: ModalProps['styles'] = (info): GetProp<ModalProps, 'styles', 'Re
     return {};
 };
 
-export const EmployeeModal = ({loadEmployees}: EmployeeModalProps) => {
+interface EmployeeModalProps {
+    loadData: () => Promise<void>;
+    allContractPositions: ContractPosition[];
+    allDivisions: Division[];
+}
+
+export const EmployeeModal = ({loadData, allDivisions, allContractPositions}: EmployeeModalProps) => {
     const [modalFnOpen, setModalFnOpen] = useState(false);
     const [form] = Form.useForm();
     const handleClose = () => {
@@ -49,7 +55,7 @@ export const EmployeeModal = ({loadEmployees}: EmployeeModalProps) => {
 
     const handleSuccess = () => {
         setModalFnOpen(false);
-        loadEmployees();
+        loadData();
     }
 
     const sharedProps: ModalProps = {
@@ -60,14 +66,15 @@ export const EmployeeModal = ({loadEmployees}: EmployeeModalProps) => {
     const footer: React.ReactNode = (
         <>
             <Button
+                variant={"filled"}
+                color={'default'}
                 onClick={() => handleClose}
-                styles={{ root: { borderColor: '#ccc', color: '#171717', backgroundColor: '#fff' } }}
             >
                 Cancel
             </Button>
             <Button
-                type="primary"
-                styles={{ root: { backgroundColor: '#171717' } }}
+                variant={"filled"}
+                color={"blue"}
                 onClick={() => form.submit()}
             >
                 Добавить сотрудника
@@ -77,7 +84,7 @@ export const EmployeeModal = ({loadEmployees}: EmployeeModalProps) => {
 
     return (
         <div className={'ml-3'}>
-            <Button type="primary" onClick={() => setModalFnOpen(true)}>
+            <Button variant={"filled"} color={"blue"} onClick={() => setModalFnOpen(true)}>
                 <PlusCircleOutlined /> Добавить сотрудника
             </Button>
             <Modal
@@ -91,7 +98,12 @@ export const EmployeeModal = ({loadEmployees}: EmployeeModalProps) => {
                 onCancel={() => setModalFnOpen(false)}
                 destroyOnHidden
             >
-                <EmployeesForm form={form} onSuccess={handleSuccess}/>
+                <EmployeesForm
+                    form={form}
+                    onSuccess={handleSuccess}
+                    allDivisions={allDivisions}
+                    allContractPositions={allContractPositions}
+                />
             </Modal>
         </div>
     )

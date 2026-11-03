@@ -2,11 +2,6 @@ import {createStaticStyles} from "antd-style";
 import {Button, Form, type GetProp, Modal, type ModalProps} from "antd";
 import {useState} from "react";
 import {PlusCircleOutlined} from "@ant-design/icons";
-import {EmployeesForm} from "../employees/EmployeesForm.tsx";
-
-interface PpeNomenclatureModalProps  {
-    loadPpeNomenclatures: () => Promise<void>;
-}
 
 const classNames = createStaticStyles(({ css }) => ({
     container: css`
@@ -39,17 +34,12 @@ const stylesFn: ModalProps['styles'] = (info): GetProp<ModalProps, 'styles', 'Re
     return {};
 };
 
-export const PpeNomenclaturesModal = ({loadPpeNomenclatures}: PpeNomenclatureModalProps) => {
+export const PpeNomenclaturesModal = () => {
     const [modalFnOpen, setModalFnOpen] = useState(false);
     const [form] = Form.useForm();
     const handleClose = () => {
         form.resetFields();
         setModalFnOpen(false);
-    }
-
-    const handleSuccess = () => {
-        setModalFnOpen(false);
-        loadPpeNomenclatures();
     }
 
     const sharedProps: ModalProps = {
@@ -90,7 +80,6 @@ export const PpeNomenclaturesModal = ({loadPpeNomenclatures}: PpeNomenclatureMod
                 onCancel={() => setModalFnOpen(false)}
                 destroyOnHidden
             >
-                <EmployeesForm form={form} onSuccess={handleSuccess}/>
             </Modal>
         </div>
     )

@@ -110,7 +110,7 @@ export const IssuanceNormsTable = () => {
                 onClose={onClose}
                 issuanceNorm={issuanceNormFind}
             />
-            <IssuanceNormModal loadIssuanceNorms={loadIssuanceNorms}/>
+            <IssuanceNormModal/>
             <Input
                 onChange={handleSearchChange}
                 className={'m-3 w-102'}

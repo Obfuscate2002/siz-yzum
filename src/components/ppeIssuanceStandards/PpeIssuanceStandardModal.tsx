@@ -2,11 +2,8 @@ import {createStaticStyles} from "antd-style";
 import {Button, Form, type GetProp, Modal, type ModalProps} from "antd";
 import {useState} from "react";
 import {PlusCircleOutlined} from "@ant-design/icons";
-import {EmployeesForm} from "../employees/EmployeesForm.tsx";
 
-interface ppeIssuanceStandardModalProps  {
-    loadPpeIssuanceStandards: () => Promise<void>;
-}
+
 
 const classNames = createStaticStyles(({ css }) => ({
     container: css`
@@ -39,17 +36,12 @@ const stylesFn: ModalProps['styles'] = (info): GetProp<ModalProps, 'styles', 'Re
     return {};
 };
 
-export const PpeIssuanceStandardModal = ({loadPpeIssuanceStandards}: ppeIssuanceStandardModalProps) => {
+export const PpeIssuanceStandardModal = () => {
     const [modalFnOpen, setModalFnOpen] = useState(false);
     const [form] = Form.useForm();
     const handleClose = () => {
         form.resetFields();
         setModalFnOpen(false);
-    }
-
-    const handleSuccess = () => {
-        setModalFnOpen(false);
-        loadPpeIssuanceStandards();
     }
 
     const sharedProps: ModalProps = {
@@ -90,7 +82,6 @@ export const PpeIssuanceStandardModal = ({loadPpeIssuanceStandards}: ppeIssuance
                 onCancel={() => setModalFnOpen(false)}
                 destroyOnHidden
             >
-                <EmployeesForm form={form} onSuccess={handleSuccess}/>
             </Modal>
         </div>
     )

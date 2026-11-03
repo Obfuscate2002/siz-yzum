@@ -1,12 +1,7 @@
 import {Button, Form, type GetProp, Modal, type ModalProps} from "antd";
 import {PlusCircleOutlined} from "@ant-design/icons";
-import {EmployeesForm} from "../employees/EmployeesForm.tsx";
 import {useState} from "react";
 import {createStaticStyles} from "antd-style";
-
-interface IssuanceNormModalProps  {
-    loadIssuanceNorms: () => Promise<void>;
-}
 
 const classNames = createStaticStyles(({ css }) => ({
     container: css`
@@ -40,17 +35,12 @@ const stylesFn: ModalProps['styles'] = (info): GetProp<ModalProps, 'styles', 'Re
 };
 
 
-export const IssuanceNormModal = ({loadIssuanceNorms}: IssuanceNormModalProps) => {
+export const IssuanceNormModal = () => {
     const [modalFnOpen, setModalFnOpen] = useState(false);
     const [form] = Form.useForm();
     const handleClose = () => {
         form.resetFields();
         setModalFnOpen(false);
-    }
-
-    const handleSuccess = () => {
-        setModalFnOpen(false);
-        loadIssuanceNorms();
     }
 
     const sharedProps: ModalProps = {
@@ -92,7 +82,7 @@ export const IssuanceNormModal = ({loadIssuanceNorms}: IssuanceNormModalProps) =
                 onCancel={() => setModalFnOpen(false)}
                 destroyOnHidden
             >
-                <EmployeesForm form={form} onSuccess={handleSuccess}/>
+
             </Modal>
         </div>
     )
