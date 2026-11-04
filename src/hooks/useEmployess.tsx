@@ -9,3 +9,28 @@ export const getEmployes = async (): Promise<Employee[]> => {
         });
         return data;
 }
+
+export const createEmployee = async (employee: Employee): Promise<void> => {
+
+    console.log("Отправляем в PocketBase:", employee);
+    const data = await pb.collection('employees').create({
+        fullName: employee.fullName,
+        contractPosition: employee.contractPosition,
+        division: employee.division,
+        personnelNumber: employee.personnelNumber,
+        date_of_employment: employee.date_of_employment,
+        comment: employee.comment,
+    })
+
+    console.log("Возвращается с бэка PocketBase:", data);
+}
+
+export const updateEmployee = async (id: string, data: Partial<Employee>): Promise<Employee> => {
+    return  await pb.collection('employees').update(id, data, {
+        expand: 'positionRelation,division,contractPosition'
+    })
+}
+
+export const deleteEmployee = async (id: string): Promise<void> => {
+    await pb.collection('employees').delete(id)
+}

@@ -1,7 +1,8 @@
-import {Form, type FormInstance, Input, message, Select} from "antd";
-import {pb} from "../../pocketbase/pocketbase.ts";
+import {DatePicker, Form, type FormInstance, Input, message, Select} from "antd";
 import type {Division} from "../../types/divisions.ts";
 import type {ContractPosition} from "../../types/contractPositions.ts";
+import type {Employee} from "../../types/employee.ts";
+import {createEmployee} from "../../hooks/useEmployess.tsx";
 
 interface EmployeesForm {
     form: FormInstance,
@@ -10,24 +11,12 @@ interface EmployeesForm {
     allContractPositions: ContractPosition[],
 }
 
-type DataProps = {
-    fullName: string,
-    position: string,
-    unit: string,
-    createdAt: string,
-    personnelNumber: string,
-}
 
 export const EmployeesForm = ({form, onSuccess, allDivisions, allContractPositions}: EmployeesForm) => {
-   const handleSubmit = async (values: DataProps) => {
+   const handleSubmit = async (values: Employee) => {
        try {
-           await pb.collection('employees').create({
-               fullName: values.fullName,
-               position: values.position,
-               unit: values.unit,
-               personnelNumber: values.personnelNumber,
-           })
-           message.success("Сотрудник добавлен")
+          await createEmployee(values);
+           message.success('Сотрудник добавлен')
            onSuccess?.()
        } catch (error) {
            message.error(error instanceof Error ? error.message : 'Не удалось добавить сотрудника');
@@ -60,6 +49,13 @@ export const EmployeesForm = ({form, onSuccess, allDivisions, allContractPositio
            </Form.Item>
            <Form.Item name='personnelNumber' label='Табельный номер:' rules={[{required: true, message: 'Заполните табельный номер'}]}>
                <Input/>
+           </Form.Item>
+           <Form.Item name='date_of_employment' label='Дата приема на работу' rules={[{required: true, message: 'Заполните дату приема на работу'}]}>
+               <DatePicker
+                   className="w-full"
+                   placeholder="Выберите дату"
+                   format="DD.MM.YYYY"
+               />
            </Form.Item>
            <Form.Item name='comment' label='Комментарий:' rules={[{required: false}]}>
                <Input.TextArea/>

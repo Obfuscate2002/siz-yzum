@@ -7,14 +7,18 @@ export interface Employee {
     personnelNumber: string;
     comment: string;
 
+    division:string;
+
     departmentRef: string;
     positionRelation: string;
     contractPosition: string;
 
-    height: number;
+    height: string;
     clothingSize: string;
     shoeSize: string;
     isActive: boolean;
+
+    date_of_employment: string;
 
     created: string;
     updated: string;

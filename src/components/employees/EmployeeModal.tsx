@@ -54,6 +54,7 @@ export const EmployeeModal = ({loadData, allDivisions, allContractPositions}: Em
     }
 
     const handleSuccess = () => {
+        form.resetFields();
         setModalFnOpen(false);
         loadData();
     }
@@ -68,14 +69,16 @@ export const EmployeeModal = ({loadData, allDivisions, allContractPositions}: Em
             <Button
                 variant={"filled"}
                 color={'default'}
-                onClick={() => handleClose}
+                onClick={() => handleClose()}
             >
-                Cancel
+                Отмена
             </Button>
             <Button
                 variant={"filled"}
                 color={"blue"}
-                onClick={() => form.submit()}
+                onClick={() => {
+                    form.submit()
+                }}
             >
                 Добавить сотрудника
             </Button>
@@ -95,7 +98,7 @@ export const EmployeeModal = ({loadData, allDivisions, allContractPositions}: Em
                 mask={{ enabled: true, blur: true }}
                 open={modalFnOpen}
                 onOk={() => setModalFnOpen(false)}
-                onCancel={() => setModalFnOpen(false)}
+                onCancel={() => handleClose()}
                 destroyOnHidden
             >
                 <EmployeesForm

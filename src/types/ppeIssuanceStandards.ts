@@ -6,7 +6,10 @@ export interface PpeIssuanceStandard {
     ppe_type: string;
     ppe_name: string;
     issuance_norm: string;
+    quantity: string;
+    issuance_period: string;
     issuance_basis: string;
+    position: string;
     position_name: string;
     created: string;
     updated: string;

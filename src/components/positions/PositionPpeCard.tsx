@@ -64,6 +64,16 @@ export function PositionPpeCard({ position }: Props) {
             key: "issuance_norm",
         },
         {
+            title: "Норма выдачи период",
+            dataIndex: "issuance_period",
+            key: "issuance_period",
+        },
+        {
+            title: "Количество",
+            dataIndex: "quantity",
+            key: "quantity",
+        },
+        {
             title: "Основание выдачи",
             dataIndex: "issuance_basis",
             key: "issuance_basis",

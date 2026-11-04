@@ -3,9 +3,11 @@ import {useState} from "react";
 import {Input, Table, Tag} from "antd";
 import {EmployeeRecord} from "./EmployeeRecord.tsx";
 import type {Employee} from "../../types/employee.ts";
+import type {PpeIssuanceStandardExpanded} from "../../types/ppeIssuanceStandards.ts";
+import type {ContractPosition} from "../../types/contractPositions.ts";
 
-const formatDate = (date: string) => {
-    if (!date) return "Не указано";
+const formatDateUpdate = (date: string) => {
+    if (!date) return;
 
     return new Intl.DateTimeFormat("ru-RU", {
         day: "2-digit",
@@ -15,6 +17,17 @@ const formatDate = (date: string) => {
         minute: "2-digit",
     }).format(new Date(date));
 };
+
+const formatDateOfEmployment = (date: string) => {
+    if(!date) return;
+
+    return new Intl.DateTimeFormat("ru-RU", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+    }).format(new Date(date));
+}
+
 
 const columns = [
     {
@@ -58,9 +71,22 @@ const columns = [
         render: (_: unknown, record: Employee) => {
             return (
                 <Tag variant={"filled"} color={"purple"}>
-                    {formatDate(record.updated) ?? 'Не указано'}
+                    {formatDateUpdate(record.updated) ?? 'Не указано'}
                 </Tag>)
         }
+    },
+    {
+        title: 'Дата приема на работу',
+        dataIndex: 'date_of_employment',
+        key: 'date_of_employment',
+        render: (_: unknown, record: Employee) => {
+            return (
+                <Tag variant={"filled"} color={"pink"}>
+                    {formatDateOfEmployment(record.date_of_employment) ?? 'Не указано'}
+                </Tag>
+            )
+        }
+
     },
     {
         title: 'Комментарий',
@@ -74,9 +100,13 @@ const columns = [
 
 interface EmployeesTableProps {
     employees: Employee[];
+    loadData: () => void;
+    ppeIssuanceStandards?: PpeIssuanceStandardExpanded[];
+    handleEmployeeUpdated: (employee: Employee) => void;
+    allContractPositions?: ContractPosition[];
 }
 
-export const EmployeesTable = ({employees}: EmployeesTableProps) => {
+export const EmployeesTable = ({employees, loadData, ppeIssuanceStandards, handleEmployeeUpdated, allContractPositions}: EmployeesTableProps) => {
     const [selectedEmployeeId, setSelectedEmployeeId] = useState<string | null>(null);
 
     const [search, setSearch] = useState('')
@@ -90,12 +120,20 @@ export const EmployeesTable = ({employees}: EmployeesTableProps) => {
     const filteredEmployees = employees.filter((employee) =>
         employee.fullName.toLowerCase().includes(search.toLowerCase()))
 
+    const handleEmployeeDelete = () => {
+        loadData()
+    }
+
     return (
         <div>
             <EmployeeRecord
                 selectedEmployeeId={selectedEmployeeId}
                 onClose={onClose}
                 employee={employee}
+                onDelete={handleEmployeeDelete}
+                ppeIssuanceStandards={ppeIssuanceStandards}
+                onEmployeeUpdated={handleEmployeeUpdated}
+                allContractPositions={allContractPositions}
             />
 
             <Input
