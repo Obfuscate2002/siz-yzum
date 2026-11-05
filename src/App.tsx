@@ -9,6 +9,7 @@ import {PageIssuanceNorms} from "./pages/PageIssuanceNorms.tsx";
 import { PageSettings } from './pages/PageSettings.tsx';
 import {PagePpeIssuanceStandards} from "./pages/PagePpeIssuanceStandards.tsx";
 import {PageOfDepartaments} from "./pages/PageOfDepartaments.tsx";
+import {PageWarehouseInventoryCatalog} from "./pages/PageWarehouseInventoryCatalog.tsx";
 
 
 function App() {
@@ -25,7 +26,12 @@ function App() {
                 <Route path={'ppeIssuanceStandards'} element={<PagePpeIssuanceStandards/>}/>
                 <Route path={'settings'} element={<PageSettings/>}/>
                 <Route path={'divisions'} element={<PageOfDepartaments/>}/>
-
+                <Route path="warehouse">
+                    <Route
+                        path="nomenclature"
+                        element={<PageWarehouseInventoryCatalog />}
+                    />
+                </Route>
             </Route>
         </Routes>
 

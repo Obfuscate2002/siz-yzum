@@ -11,6 +11,7 @@ import type {Employee} from "../types/employee.ts";
 import {ImportEmployees} from "../components/employees/ImportEmployees.tsx";
 import {getPpeIssuanceStandards} from "../hooks/usePpeIssuanceStandards.tsx";
 import type {PpeIssuanceStandardExpanded} from "../types/ppeIssuanceStandards.ts";
+import {getPositions, type Position} from "../hooks/usePositions.tsx";
 
 export const PageEmployees = () => {
     const [loading, setLoading] = useState(false);
@@ -18,6 +19,8 @@ export const PageEmployees = () => {
     const [allDivisions, setAllDivisions] = useState<Division[]>([]);
     const [employees, setEmployees] = useState<Employee[]>([])
     const [ppeIssuanceStandards, setPpeIssuanceStandards] = useState<PpeIssuanceStandardExpanded[]>()
+    const [allPpePositions, setAllPpePositions] = useState<Position[]>([])
+
 
     const handleEmployeeUpdated = (updatedEmployee: Employee) => {
         setEmployees(prev => prev.map(item => item.id === updatedEmployee.id ? updatedEmployee : item));
@@ -30,10 +33,11 @@ export const PageEmployees = () => {
                 getEmployes(),
                 getDivisions(),
                 getContractPositions(),
-                getPpeIssuanceStandards()
+                getPpeIssuanceStandards(),
+                getPositions()
             ]);
 
-            const [employeesResult, divisionsResult, positionsResult, ppeIssuanceStandardResult] = results;
+            const [employeesResult, divisionsResult, positionsResult, ppeIssuanceStandardResult, allPositionsPpeResult] = results;
 
             if (employeesResult.status === "fulfilled") {
                 setEmployees(employeesResult.value);
@@ -57,6 +61,11 @@ export const PageEmployees = () => {
             } else {
                 console.error("Ошибка норм выдачи СИЗ:", ppeIssuanceStandardResult.reason);
             }
+            if (allPositionsPpeResult.status === "fulfilled") {
+                setAllPpePositions(allPositionsPpeResult.value);
+            } else {
+                console.error("Ошибка норм выдачи СИЗ:", allPositionsPpeResult.reason);
+            }
 
         } catch (error) {
             console.error("Ошибка загрузки:", error);
@@ -78,6 +87,7 @@ return (
                 loadData={loadData}
                 allContractPositions={allContractPositions}
                 allDivisions={allDivisions}
+                allPpePositions={allPpePositions}
 
             />
             <ImportEmployees />
@@ -89,6 +99,7 @@ return (
             loadData={loadData}
             handleEmployeeUpdated={handleEmployeeUpdated}
             allContractPositions={allContractPositions}
+            allPpePositions={allPpePositions}
         />
     </div>
 )

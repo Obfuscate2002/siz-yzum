@@ -1,10 +1,11 @@
-import {Button, Form, type GetProp, Modal, type ModalProps} from "antd";
+import {Button, Form, type GetProp, Modal, type ModalProps, Typography} from "antd";
 import { createStaticStyles } from 'antd-style';
 import {useState} from "react";
 import {EmployeesForm} from "./EmployeesForm.tsx";
 import {PlusCircleOutlined} from "@ant-design/icons";
 import type {ContractPosition} from "../../types/contractPositions.ts";
 import type {Division} from "../../types/divisions.ts";
+import type {Position} from "../../hooks/usePositions.tsx";
 
 
 
@@ -43,9 +44,10 @@ interface EmployeeModalProps {
     loadData: () => Promise<void>;
     allContractPositions: ContractPosition[];
     allDivisions: Division[];
+    allPpePositions: Position[]
 }
 
-export const EmployeeModal = ({loadData, allDivisions, allContractPositions}: EmployeeModalProps) => {
+export const EmployeeModal = ({loadData, allDivisions, allContractPositions, allPpePositions}: EmployeeModalProps) => {
     const [modalFnOpen, setModalFnOpen] = useState(false);
     const [form] = Form.useForm();
     const handleClose = () => {
@@ -93,7 +95,7 @@ export const EmployeeModal = ({loadData, allDivisions, allContractPositions}: Em
             <Modal
                 {...sharedProps}
                 footer={footer}
-                title="Добавить сотрудника"
+                title={<Typography.Title level={1}>Добавить сотрудника</Typography.Title>}
                 styles={stylesFn}
                 mask={{ enabled: true, blur: true }}
                 open={modalFnOpen}
@@ -106,6 +108,7 @@ export const EmployeeModal = ({loadData, allDivisions, allContractPositions}: Em
                     onSuccess={handleSuccess}
                     allDivisions={allDivisions}
                     allContractPositions={allContractPositions}
+                    allPpePositions={allPpePositions}
                 />
             </Modal>
         </div>

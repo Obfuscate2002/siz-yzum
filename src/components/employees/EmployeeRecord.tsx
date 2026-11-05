@@ -18,6 +18,7 @@ import {useEffect, useState} from "react";
 import {deleteEmployee, updateEmployee} from "../../hooks/useEmployess.tsx";
 import type {PpeIssuanceStandardExpanded} from "../../types/ppeIssuanceStandards.ts";
 import type {ContractPosition} from "../../types/contractPositions.ts";
+import type {Position} from "../../hooks/usePositions.tsx";
 interface EmployeeFormValues {
     fullName: string;
     position: string;
@@ -64,9 +65,10 @@ interface SharedContentProps {
     ppeIssuanceStandards?: PpeIssuanceStandardExpanded[];
     onEmployeeUpdated: (employee: Employee) => void;
     allContractPositions?: ContractPosition[];
+    allPpePositions: Position[];
 }
 
-const SharedContent = ({employee, isEdit, setEdit, handleDelete, ppeIssuanceStandards, onEmployeeUpdated,allContractPositions}: SharedContentProps) => {
+const SharedContent = ({employee, isEdit, setEdit, handleDelete, ppeIssuanceStandards, onEmployeeUpdated,allContractPositions, allPpePositions}: SharedContentProps) => {
 
     const [loading, setLoading] = useState(false);
 
@@ -85,8 +87,8 @@ const SharedContent = ({employee, isEdit, setEdit, handleDelete, ppeIssuanceStan
     const setEmployeeFormValues = (employee: Employee) => {
         form.setFieldsValue({
             fullName: employee.fullName,
-            position: employee.position,
-            division: employee.expand?.division?.name ?? "",
+            positionRelation: employee.positionRelation,
+            division: employee.division,
             contractPosition: employee.contractPosition,
             personnelNumber: employee.personnelNumber,
             date_of_employment: employee.date_of_employment
@@ -166,6 +168,15 @@ const SharedContent = ({employee, isEdit, setEdit, handleDelete, ppeIssuanceStan
                                     value: item.id
                                 }))}/>
                             </Form.Item>
+                            <Form.Item label={'Должность по СИЗ'} name={'positionRelation'}>
+                                <Select
+                                    options={allPpePositions.map((item) => ({
+                                        label: item.name,
+                                        value: item.id
+                                    }))}
+                                />
+                            </Form.Item>
+
                             <Form.Item label={'Подразделение'} name={'division'}>
                                 <Input/>
                             </Form.Item>
@@ -200,18 +211,23 @@ const SharedContent = ({employee, isEdit, setEdit, handleDelete, ppeIssuanceStan
                     </Form>
                 </>
             ) : (
+                <>
                 <div className={'grid grid-cols-2 gap-4'}>
                     <div className={'flex flex-col'}>
                         <Text strong>ФИО</Text>
                         <Text>{employee?.fullName}</Text>
                     </div>
                     <div className={'flex flex-col'}>
+                        <Text strong>Подразделение</Text>
+                        <Text>{employee?.expand?.division?.name}</Text>
+                    </div>
+                    <div className={'flex flex-col'}>
                         <Text strong>Должность по трудовому договору</Text>
                         <Text>{employee?.expand?.contractPosition?.name}</Text>
                     </div>
                     <div className={'flex flex-col'}>
-                        <Text strong>Подразделение</Text>
-                        <Text>{employee?.expand?.division?.name}</Text>
+                        <Text strong>Должность по СИЗ</Text>
+                        <Text>{employee?.expand?.positionRelation?.name}</Text>
                     </div>
                     <div className={'flex flex-col'}>
                         <Text strong>Табельный номер</Text>
@@ -237,9 +253,8 @@ const SharedContent = ({employee, isEdit, setEdit, handleDelete, ppeIssuanceStan
                         <Text strong>Комментарий</Text>
                         <Text>{employee?.comment === '' ? 'Не указано' :employee?.comment}</Text>
                     </div>
+                </div>
                     <div className={'flex justify-end'}>
-
-
                         <Button
                             color={'blue'}
                             variant={'filled'}
@@ -265,9 +280,8 @@ const SharedContent = ({employee, isEdit, setEdit, handleDelete, ppeIssuanceStan
                                 Удалить сотрудника
                             </Button>
                         </Popconfirm>
-
                     </div>
-                </div>
+                </>
             )}
             <Divider/>
             <Typography.Title level={3}>
@@ -319,9 +333,10 @@ type SelectProp = {
     ppeIssuanceStandards?: PpeIssuanceStandardExpanded[];
     onEmployeeUpdated: (employee: Employee) => void;
     allContractPositions?: ContractPosition[];
+    allPpePositions: Position[];
 }
 
-export const EmployeeRecord = ({selectedEmployeeId, onClose, employee, onDelete, ppeIssuanceStandards, onEmployeeUpdated, allContractPositions}: SelectProp) => {
+export const EmployeeRecord = ({selectedEmployeeId, onClose, employee, onDelete, ppeIssuanceStandards, onEmployeeUpdated, allContractPositions, allPpePositions}: SelectProp) => {
     const [isEdit, setEdit] = useState(false);
 
     const handleDelete = async () => {
@@ -368,6 +383,7 @@ export const EmployeeRecord = ({selectedEmployeeId, onClose, employee, onDelete,
                 ppeIssuanceStandards={ppeIssuanceStandards}
                 onEmployeeUpdated={onEmployeeUpdated}
                 allContractPositions={allContractPositions}
+                allPpePositions={allPpePositions}
             />
         </Drawer>
     )

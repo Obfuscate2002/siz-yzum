@@ -4,7 +4,7 @@ import {HeaderLayout} from "./Header.tsx";
 import {Outlet, useLocation} from "react-router";
 const {Content, Footer} = Layout;
 
-type PagePath = '/employees' | '/ppe' | '/norms' | '/dashboard' | '/settings' | '/norms_catalog' | '/issuance_norms' | '/ppeIssuanceStandards' | '/divisions';
+type PagePath = '/employees' | '/ppe' | '/norms' | '/dashboard' | '/settings' | '/norms_catalog' | '/issuance_norms' | '/ppeIssuanceStandards' | '/divisions' | '/warehouse/nomenclature';
 
 const AppLayout: React.FC = () => {
 
@@ -20,7 +20,8 @@ const AppLayout: React.FC = () => {
         '/issuance_norms': 'Нормы выдачи',
         '/ppeIssuanceStandards': 'Справочник норм СИЗ',
         '/settings': 'Настройки',
-        '/divisions': 'Справочник подразделений'
+        '/divisions': 'Справочник подразделений',
+        '/warehouse/nomenclature': 'Справочник номенклатуры'
 
     };
 
@@ -34,6 +35,13 @@ const AppLayout: React.FC = () => {
             title: 'Главная',
             href: '/dashboard',
         },
+        ...(currentPath.startsWith('/warehouse')
+            ? [
+                {
+                    title: 'Склад',
+                },
+            ]
+            : []),
         {
             title: currentTitle,
         },
@@ -50,14 +58,23 @@ const AppLayout: React.FC = () => {
     return (
         <Layout style={{ minHeight: '100vh' }}>
         <Sidebar/>
-            <Layout>
+            <Layout style={{
+                marginLeft: 280,
+                minHeight: '100vh',
+                background: '#f5f5f5',
+            }}>
                 <HeaderLayout/>
-                <Content style={{ margin: '0 16px' }}>
+                <Content style={{
+                    margin: '0 16px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                }}>
                     <Breadcrumb style={{ margin: '16px 0' }} items={items} />
                     <div
                         style={{
                             padding: 24,
                             minHeight: 360,
+                            flex: 1,
                             background: colorBgContainer,
                             borderRadius: borderRadiusLG,
                         }}

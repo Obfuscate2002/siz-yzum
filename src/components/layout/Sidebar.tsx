@@ -1,9 +1,10 @@
-import {Menu, type MenuProps} from "antd";
+import {Avatar, Menu, type MenuProps} from "antd";
 import React from "react";
 import Sider from "antd/es/layout/Sider";
 import {
+    AppstoreOutlined,
     BankOutlined, CheckSquareOutlined,
-    HomeOutlined, SafetyOutlined, SettingOutlined, UsergroupAddOutlined,
+    HomeOutlined, SafetyOutlined, SettingOutlined, ShopOutlined, UsergroupAddOutlined,
     UserOutlined
 } from "@ant-design/icons";
 import {useLocation, useNavigate} from "react-router";
@@ -32,6 +33,13 @@ const items: MenuItem[] = [
     getItem('Справочник норм СИЗ', 'ppeIssuanceStandards'),
     getItem('Справочник подразделений', 'divisions'),
     getItem('Настройки', 'settings', <SettingOutlined />),
+    getItem('Склад', 'warehouse', <ShopOutlined />, [
+        getItem(
+            'Справочник номенклатуры',
+            '/warehouse/nomenclature',
+            <AppstoreOutlined />
+        ),
+    ]),
 
 ];
 
@@ -46,7 +54,21 @@ export const Sidebar = () => {
 
     return (
         <div className={'min-h-screen'}>
-            <Sider className={'bg-gray-50 '}>
+            <Sider
+                width={280}
+                className={'bg-gray-50 '}
+                breakpoint="lg"
+                collapsedWidth={0}
+                style={{
+                    position: 'fixed',
+                    left: 0,
+                    top: 0,
+                    bottom: 0,
+                    height: '100vh',
+                    overflowY: 'auto',
+                    zIndex: 1000,
+                }}
+            >
                 <div className={'flex flex-col min-h-screen'}>
                     <div className={"flex flex-col leading-tight overflow-hidden items-center"}>
                     <span className={'text-blue-500 text-base font-semibold tracking-wide whitespace-nowrap m-3'}>
@@ -63,7 +85,7 @@ export const Sidebar = () => {
                         />
                     </div>
                     <div className={'flex flex-row justify-center items-center'}>
-                        <UserOutlined  className={'text-3xl'}/>
+                        <Avatar size="large" icon={<UserOutlined />} />
                         <div className={'flex flex-col m-3 justify-center items-center'}>
                             <div className={'flex gap-2'}>
 
