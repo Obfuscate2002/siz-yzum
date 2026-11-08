@@ -100,6 +100,7 @@ return (
             handleEmployeeUpdated={handleEmployeeUpdated}
             allContractPositions={allContractPositions}
             allPpePositions={allPpePositions}
+            allDivisions={allDivisions}
         />
     </div>
 )

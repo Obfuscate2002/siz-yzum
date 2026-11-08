@@ -59,7 +59,7 @@ export const DivisionCard = ({selectDivision, allPpePositions, allContractPositi
                        <li
                            key={division.id}
                        >
-                           <Tag color={'blue-inverse'} variant={'outlined'} className={'text-lg'}>
+                           <Tag color={'blue'} variant={'outlined'} className={'text-lg'}>
                                {division.name}
                            </Tag>
 

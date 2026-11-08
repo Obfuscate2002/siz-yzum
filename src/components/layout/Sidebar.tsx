@@ -3,7 +3,7 @@ import React from "react";
 import Sider from "antd/es/layout/Sider";
 import {
     AppstoreOutlined,
-    BankOutlined, CheckSquareOutlined,
+    BankOutlined, CheckSquareOutlined, FileTextOutlined,
     HomeOutlined, SafetyOutlined, SettingOutlined, ShopOutlined, UsergroupAddOutlined,
     UserOutlined
 } from "@ant-design/icons";
@@ -39,7 +39,13 @@ const items: MenuItem[] = [
             '/warehouse/nomenclature',
             <AppstoreOutlined />
         ),
+        getItem(
+            'Справочник контрагентов',
+            '/warehouse/counterparties',
+            <AppstoreOutlined />
+        ),
     ]),
+    getItem('Ведомость выдачи СИЗ', 'ppeIssuanceStatements', <FileTextOutlined />),
 
 ];
 

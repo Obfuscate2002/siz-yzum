@@ -6,6 +6,7 @@ import type {Employee} from "../../types/employee.ts";
 import type {PpeIssuanceStandardExpanded} from "../../types/ppeIssuanceStandards.ts";
 import type {ContractPosition} from "../../types/contractPositions.ts";
 import type {Position} from "../../hooks/usePositions.tsx";
+import type {Division} from "../../types/divisions.ts";
 
 const formatDateUpdate = (date: string) => {
     if (!date) return;
@@ -106,9 +107,17 @@ interface EmployeesTableProps {
     handleEmployeeUpdated: (employee: Employee) => void;
     allContractPositions?: ContractPosition[];
     allPpePositions: Position[];
+    allDivisions: Division[];
 }
 
-export const EmployeesTable = ({employees, loadData, ppeIssuanceStandards, handleEmployeeUpdated, allContractPositions, allPpePositions}: EmployeesTableProps) => {
+export const EmployeesTable = ({
+                                   employees,
+                                   loadData,
+                                   ppeIssuanceStandards,
+                                   handleEmployeeUpdated,
+                                   allContractPositions,
+                                   allPpePositions,
+                                   allDivisions}: EmployeesTableProps) => {
     const [selectedEmployeeId, setSelectedEmployeeId] = useState<string | null>(null);
 
     const [search, setSearch] = useState('')
@@ -137,6 +146,7 @@ export const EmployeesTable = ({employees, loadData, ppeIssuanceStandards, handl
                 onEmployeeUpdated={handleEmployeeUpdated}
                 allContractPositions={allContractPositions}
                 allPpePositions={allPpePositions}
+                allDivisions={allDivisions}
             />
 
             <Input

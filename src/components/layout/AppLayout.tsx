@@ -4,7 +4,19 @@ import {HeaderLayout} from "./Header.tsx";
 import {Outlet, useLocation} from "react-router";
 const {Content, Footer} = Layout;
 
-type PagePath = '/employees' | '/ppe' | '/norms' | '/dashboard' | '/settings' | '/norms_catalog' | '/issuance_norms' | '/ppeIssuanceStandards' | '/divisions' | '/warehouse/nomenclature';
+type PagePath =
+    | '/employees'
+    | '/ppe'
+    | '/norms'
+    | '/dashboard'
+    | '/settings'
+    | '/norms_catalog'
+    | '/issuance_norms'
+    | '/ppeIssuanceStandards'
+    | '/divisions'
+    | '/warehouse/nomenclature'
+    | '/warehouse/counterparties'
+    | '/ppeIssuanceStatements'
 
 const AppLayout: React.FC = () => {
 
@@ -21,8 +33,9 @@ const AppLayout: React.FC = () => {
         '/ppeIssuanceStandards': 'Справочник норм СИЗ',
         '/settings': 'Настройки',
         '/divisions': 'Справочник подразделений',
-        '/warehouse/nomenclature': 'Справочник номенклатуры'
-
+        '/warehouse/nomenclature': 'Справочник номенклатуры',
+        '/warehouse/counterparties': 'Справочник контрагентов',
+        '/ppeIssuanceStatements': 'Ведомость выдачи СИЗ'
     };
 
     const currentTitle: string =
@@ -33,7 +46,6 @@ const AppLayout: React.FC = () => {
     const items = [
         {
             title: 'Главная',
-            href: '/dashboard',
         },
         ...(currentPath.startsWith('/warehouse')
             ? [

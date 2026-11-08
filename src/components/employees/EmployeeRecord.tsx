@@ -19,6 +19,7 @@ import {deleteEmployee, updateEmployee} from "../../hooks/useEmployess.tsx";
 import type {PpeIssuanceStandardExpanded} from "../../types/ppeIssuanceStandards.ts";
 import type {ContractPosition} from "../../types/contractPositions.ts";
 import type {Position} from "../../hooks/usePositions.tsx";
+import type {Division} from "../../types/divisions.ts";
 interface EmployeeFormValues {
     fullName: string;
     position: string;
@@ -66,9 +67,19 @@ interface SharedContentProps {
     onEmployeeUpdated: (employee: Employee) => void;
     allContractPositions?: ContractPosition[];
     allPpePositions: Position[];
+    allDivisions: Division[];
 }
 
-const SharedContent = ({employee, isEdit, setEdit, handleDelete, ppeIssuanceStandards, onEmployeeUpdated,allContractPositions, allPpePositions}: SharedContentProps) => {
+const SharedContent = ({
+                           employee,
+                           isEdit,
+                           setEdit,
+                           handleDelete,
+                           ppeIssuanceStandards,
+                           onEmployeeUpdated,
+                           allContractPositions,
+                           allPpePositions,
+                           allDivisions}: SharedContentProps) => {
 
     const [loading, setLoading] = useState(false);
 
@@ -178,7 +189,10 @@ const SharedContent = ({employee, isEdit, setEdit, handleDelete, ppeIssuanceStan
                             </Form.Item>
 
                             <Form.Item label={'Подразделение'} name={'division'}>
-                                <Input/>
+                                <Select options={allDivisions.map((item) => ({
+                                    label: item.name,
+                                    value: item.id
+                                }))}/>
                             </Form.Item>
                             <Form.Item label={'Табельный номер'} name={'personnelNumber'}>
                                 <Input/>
@@ -334,9 +348,19 @@ type SelectProp = {
     onEmployeeUpdated: (employee: Employee) => void;
     allContractPositions?: ContractPosition[];
     allPpePositions: Position[];
+    allDivisions: Division[];
 }
 
-export const EmployeeRecord = ({selectedEmployeeId, onClose, employee, onDelete, ppeIssuanceStandards, onEmployeeUpdated, allContractPositions, allPpePositions}: SelectProp) => {
+export const EmployeeRecord = ({
+                                   selectedEmployeeId,
+                                   onClose,
+                                   employee,
+                                   onDelete,
+                                   ppeIssuanceStandards,
+                                   onEmployeeUpdated,
+                                   allContractPositions,
+                                   allPpePositions,
+                                   allDivisions}: SelectProp) => {
     const [isEdit, setEdit] = useState(false);
 
     const handleDelete = async () => {
@@ -384,6 +408,7 @@ export const EmployeeRecord = ({selectedEmployeeId, onClose, employee, onDelete,
                 onEmployeeUpdated={onEmployeeUpdated}
                 allContractPositions={allContractPositions}
                 allPpePositions={allPpePositions}
+                allDivisions={allDivisions}
             />
         </Drawer>
     )

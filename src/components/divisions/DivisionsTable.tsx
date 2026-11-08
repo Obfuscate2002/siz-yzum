@@ -87,7 +87,7 @@ export const DivisionsTable = () => {
             <Drawer
                 open={selectDivision !== null}
                 onClose={() => setSelectedDivision(null)}
-                width={1000}
+                size={1000}
                 title={selectDivision?.name}
             >
                 {selectDivision && <DivisionCard
