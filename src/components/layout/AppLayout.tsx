@@ -17,6 +17,7 @@ type PagePath =
     | '/warehouse/nomenclature'
     | '/warehouse/counterparties'
     | '/ppeIssuanceStatements'
+    | '/warehouse/goodsReceiptNotes'
 
 const AppLayout: React.FC = () => {
 
@@ -35,7 +36,8 @@ const AppLayout: React.FC = () => {
         '/divisions': 'Справочник подразделений',
         '/warehouse/nomenclature': 'Справочник номенклатуры',
         '/warehouse/counterparties': 'Справочник контрагентов',
-        '/ppeIssuanceStatements': 'Ведомость выдачи СИЗ'
+        '/ppeIssuanceStatements': 'Ведомость выдачи СИЗ',
+        '/warehouse/goodsReceiptNotes': 'Приходные накладные',
     };
 
     const currentTitle: string =
@@ -58,8 +60,6 @@ const AppLayout: React.FC = () => {
             title: currentTitle,
         },
     ];
-
-
 
     const {
         token: { colorBgContainer, borderRadiusLG },

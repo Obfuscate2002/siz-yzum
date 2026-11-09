@@ -44,6 +44,11 @@ const items: MenuItem[] = [
             '/warehouse/counterparties',
             <AppstoreOutlined />
         ),
+        getItem(
+            'Приходные накладные',
+            '/warehouse/goodsReceiptNotes',
+            <AppstoreOutlined />
+        ),
     ]),
     getItem('Ведомость выдачи СИЗ', 'ppeIssuanceStatements', <FileTextOutlined />),
 

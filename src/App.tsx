@@ -12,6 +12,7 @@ import {PageOfDepartaments} from "./pages/PageOfDepartaments.tsx";
 import {PageWarehouseNomenclature} from "./pages/PageWarehouseNomenclature.tsx";
 import {PageWarehouseСounterparties} from "./pages/PageWarehouseСounterparties.tsx";
 import {PagePpeIssuanceStatements} from "./pages/PagePpeIssuanceStatements.tsx";
+import {PageGoodsReceiptNotes} from "./pages/PageGoodsReceiptNotes.tsx";
 
 
 function App() {
@@ -36,6 +37,10 @@ function App() {
                     <Route
                         path="counterparties"
                         element={<PageWarehouseСounterparties />}
+                    />
+                    <Route
+                        path="goodsReceiptNotes"
+                        element={<PageGoodsReceiptNotes/>}
                     />
                 </Route>
                 <Route path={'ppeIssuanceStatements'} element={<PagePpeIssuanceStatements/>}/>
