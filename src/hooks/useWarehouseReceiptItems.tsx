@@ -1,11 +1,11 @@
-import {pb} from "../pocketbase/pocketbase.ts";
-import type {WarehouseReceiptItem} from "../types/WarehouseReceiptItem.ts";
+import {useQuery} from "@tanstack/react-query";
+import { getWarehouseReceiptItems } from "../api/warehouseReceiptItems.api";
 
+export const warehouseReceiptItemsKey = ['warehouseReceiptItems']
 
-export const getWarehouseReceiptItems = async (): Promise<WarehouseReceiptItem[]> => {
-    const data = pb.collection('warehouse_receipt_items').getFullList<WarehouseReceiptItem>({
-        expand: 'receipt, nomenclature'
+export const useWarehouseReceiptItems = () => {
+    return useQuery({
+        queryKey: warehouseReceiptItemsKey,
+        queryFn: getWarehouseReceiptItems
     })
-
-    return data
 }

@@ -9,6 +9,7 @@ import UpdateDivisionRelations from "../components/settings/UpdateDivisionRelati
 import ImportPpePositions from "../components/settings/ImportPpePositions.tsx";
 import {LinkEmployeeRelations} from "../components/settings/LinkEmployeeRelations.tsx";
 import {ImportPpeStandards} from "../components/settings/importPpeStandards.tsx";
+import ImportExcelButton from "../components/settings/ImportExcelButton.tsx";
 
 export const PageSettings = () => {
 
@@ -67,6 +68,10 @@ export const PageSettings = () => {
                     <div>
                         123123123123123213123123123213213
                         <ImportPpeStandards/>
+                    </div>
+                    <div>
+                        12313
+                        <ImportExcelButton/>
                     </div>
                 </div>
 

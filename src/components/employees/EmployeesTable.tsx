@@ -5,8 +5,8 @@ import {EmployeeRecord} from "./EmployeeRecord.tsx";
 import type {Employee} from "../../types/employee.ts";
 import type {PpeIssuanceStandardExpanded} from "../../types/ppeIssuanceStandards.ts";
 import type {ContractPosition} from "../../types/contractPositions.ts";
-import type {Position} from "../../hooks/usePositions.tsx";
 import type {Division} from "../../types/divisions.ts";
+import type {Position} from "../../api/ppePositions.api.ts";
 
 const formatDateUpdate = (date: string) => {
     if (!date) return;
@@ -159,6 +159,7 @@ export const EmployeesTable = ({
             />
 
             <Table
+                rowKey={'id'}
                 columns={columns}
                 dataSource={filteredEmployees}
                 onRow={(record) => ({

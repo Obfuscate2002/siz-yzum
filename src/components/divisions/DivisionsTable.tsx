@@ -1,11 +1,11 @@
 import {Drawer, Input, message, Table} from "antd";
 import {useEffect, useState} from "react";
 import type {Division} from "../../types/divisions.ts";
-import {getDivisions} from "../../hooks/useDivisions.tsx";
 import { DivisionCard } from "./DivisionCard.tsx";
-import {getPositions, type Position} from "../../hooks/usePositions.tsx";
-import {getContractPositions} from "../../hooks/useContractPositions.tsx";
 import type {ContractPosition} from "../../types/contractPositions.ts";
+import {getPositions, type Position} from "../../api/ppePositions.api.ts";
+import {getContractPositions} from "../../api/contractPositions.api.ts";
+import {getDivisions} from "../../api/divisions.api.ts";
 
 
 export const DivisionsTable = () => {

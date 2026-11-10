@@ -1,10 +1,13 @@
-import {pb} from "../pocketbase/pocketbase.ts";
-import type {ContractPosition} from "../types/contractPositions.ts";
+import { useQuery } from "@tanstack/react-query"
+import {getContractPositions} from "../api/contractPositions.api.ts";
 
-export const getContractPositions = async (): Promise<ContractPosition[]> => {
-    const data = await pb.collection('contract_positions').getFullList<ContractPosition>({
-        requestKey: null,
-        expand: 'division'
+
+
+export const contractPositionKey = ['contractPosition']
+
+export const useContractPositions = () => {
+    return useQuery({
+        queryKey: contractPositionKey,
+        queryFn: getContractPositions,
     })
-    return data
 }

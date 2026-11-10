@@ -2,8 +2,8 @@ import type {Division} from "../../types/divisions.ts";
 import {Button, Descriptions, type DescriptionsProps, message, Select, Tag} from "antd";
 import {useState} from "react";
 import type {ContractPosition} from "../../types/contractPositions.ts";
-import type {Position} from "../../hooks/usePositions.tsx";
-import {updateDivisions} from "../../hooks/useDivisions.tsx";
+import type {Position} from "../../api/ppePositions.api.ts";
+import {updateDivisions} from "../../api/divisions.api.ts";
 
 interface DivisionCardProps {
     selectDivision: Division

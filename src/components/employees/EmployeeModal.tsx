@@ -5,7 +5,7 @@ import {EmployeesForm} from "./EmployeesForm.tsx";
 import {PlusCircleOutlined} from "@ant-design/icons";
 import type {ContractPosition} from "../../types/contractPositions.ts";
 import type {Division} from "../../types/divisions.ts";
-import type {Position} from "../../hooks/usePositions.tsx";
+import type {Position} from "../../api/ppePositions.api.ts";
 
 
 

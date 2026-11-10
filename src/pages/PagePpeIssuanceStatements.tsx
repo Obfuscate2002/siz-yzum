@@ -18,10 +18,10 @@
     import type {PpeIssuanceStatementItem} from "../types/PpeIssuanceStatementItem.ts";
     import {getPpeIssuanceStatementItems} from "../hooks/usePpeIssuanceStatementItems.tsx";
     import type {Division} from "../types/divisions.ts";
-    import {getDivisions} from "../hooks/useDivisions.tsx";
     import type {Employee} from "../types/employee.ts";
-    import {getEmployes} from "../hooks/useEmployess.tsx";
     import type {ColumnsType} from "antd/es/table";
+    import {getDivisions} from "../api/divisions.api.ts";
+    import {getEmployes} from "../api/employees.api.ts";
     export const PagePpeIssuanceStatements = () => {
 
         const [ppeIssuanceStatements, setPpeIssuanceStatements] = useState<PpeIssuanceStatement[]>([]);

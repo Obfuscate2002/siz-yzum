@@ -2,8 +2,8 @@ import {DatePicker, Divider, Form, type FormInstance, Input, message, Select} fr
 import type {Division} from "../../types/divisions.ts";
 import type {ContractPosition} from "../../types/contractPositions.ts";
 import type {Employee} from "../../types/employee.ts";
-import {createEmployee} from "../../hooks/useEmployess.tsx";
-import type {Position} from "../../hooks/usePositions.tsx";
+import type {Position} from "../../api/ppePositions.api.ts";
+import {createEmployee} from "../../api/employees.api.ts";
 
 interface EmployeesForm {
     form: FormInstance,

@@ -1,84 +1,78 @@
 import {EmployeesTable} from "../components/employees/EmployeesTable.tsx";
-import {useEffect, useState} from "react";
-import {message} from "antd";
-import type {ContractPosition} from "../types/contractPositions.ts";
-import {getContractPositions} from "../hooks/useContractPositions.tsx";
-import type {Division} from "../types/divisions.ts";
-import {getDivisions} from "../hooks/useDivisions.tsx";
 import {EmployeeModal} from "../components/employees/EmployeeModal.tsx";
-import {getEmployes} from "../hooks/useEmployess.tsx";
 import type {Employee} from "../types/employee.ts";
 import {ImportEmployees} from "../components/employees/ImportEmployees.tsx";
-import {getPpeIssuanceStandards} from "../hooks/usePpeIssuanceStandards.tsx";
-import type {PpeIssuanceStandardExpanded} from "../types/ppeIssuanceStandards.ts";
-import {getPositions, type Position} from "../hooks/usePositions.tsx";
+import {employeesKey, useEmployees} from "../hooks/useEmployess.tsx";
+import {useQueryClient} from "@tanstack/react-query";
+import {useContractPositions} from "../hooks/useContractPositions.tsx";
+import {useDivisions} from "../hooks/useDivisions.tsx";
+import {usePpeIssuanceStandards} from "../hooks/usePpeIssuanceStandards.tsx";
+import {usePpePositions} from "../hooks/usePositions.tsx";
 
 export const PageEmployees = () => {
-    const [loading, setLoading] = useState(false);
-    const [allContractPositions, setAllContractPositions] = useState<ContractPosition[]>([]);
-    const [allDivisions, setAllDivisions] = useState<Division[]>([]);
-    const [employees, setEmployees] = useState<Employee[]>([])
-    const [ppeIssuanceStandards, setPpeIssuanceStandards] = useState<PpeIssuanceStandardExpanded[]>()
-    const [allPpePositions, setAllPpePositions] = useState<Position[]>([])
+    const {
+        data: employees = [],
+        isLoading: employeesLoading,
+        isError: employeesIsError,
+        error: employeesError,
+    } = useEmployees()
+
+    const {
+        data: allContractPositions = [],
+        isLoading: allContractPositionsLoading,
+    } = useContractPositions()
+
+    const {
+        data: allDivisions = [],
+        isLoading: allDivisionsLoading,
+    } = useDivisions()
+
+    const {
+        data: ppeIssuanceStandards = [],
+        isLoading: ppeIssuanceStandardsLoading,
+    } = usePpeIssuanceStandards()
+
+    const {
+        data: allPpePositions = [],
+        isLoading: ppePositionsLoading,
+    } = usePpePositions()
+
+    const loading =
+        employeesLoading ||
+        allContractPositionsLoading  ||
+        allDivisionsLoading ||
+        ppeIssuanceStandardsLoading ||
+        ppePositionsLoading
 
 
-    const handleEmployeeUpdated = (updatedEmployee: Employee) => {
-        setEmployees(prev => prev.map(item => item.id === updatedEmployee.id ? updatedEmployee : item));
-    }
+    const queryClient = useQueryClient();
 
     const loadData = async () => {
-        setLoading(true);
-        try {
-            const results = await Promise.allSettled([
-                getEmployes(),
-                getDivisions(),
-                getContractPositions(),
-                getPpeIssuanceStandards(),
-                getPositions()
-            ]);
-
-            const [employeesResult, divisionsResult, positionsResult, ppeIssuanceStandardResult, allPositionsPpeResult] = results;
-
-            if (employeesResult.status === "fulfilled") {
-                setEmployees(employeesResult.value);
-            } else {
-                console.error("Ошибка сотрудников:", employeesResult.reason);
-            }
-
-            if (divisionsResult.status === "fulfilled") {
-                setAllDivisions(divisionsResult.value);
-            } else {
-                console.error("Ошибка подразделений:", divisionsResult.reason);
-            }
-
-            if (positionsResult.status === "fulfilled") {
-                setAllContractPositions(positionsResult.value);
-            } else {
-                console.error("Ошибка должностей:", positionsResult.reason);
-            }
-            if (ppeIssuanceStandardResult.status === "fulfilled") {
-                setPpeIssuanceStandards(ppeIssuanceStandardResult.value);
-            } else {
-                console.error("Ошибка норм выдачи СИЗ:", ppeIssuanceStandardResult.reason);
-            }
-            if (allPositionsPpeResult.status === "fulfilled") {
-                setAllPpePositions(allPositionsPpeResult.value);
-            } else {
-                console.error("Ошибка норм выдачи СИЗ:", allPositionsPpeResult.reason);
-            }
-
-        } catch (error) {
-            console.error("Ошибка загрузки:", error);
-            message.error("Не удалось загрузить данные");
-        } finally {
-            setLoading(false);
-        }
+        await queryClient.invalidateQueries({
+            queryKey: employeesKey,
+        })
     }
 
-    useEffect(() => {
-        void loadData();
-    }, [loading]);
+    const handleEmployeeUpdated = (updatedEmployee: Employee) => {
+        queryClient.setQueryData<Employee[]>(
+            employeesKey,
+            (prev = []) =>
+                prev.map(item =>
+                    item.id === updatedEmployee.id
+                        ? updatedEmployee
+                        : item
+                )
+        );
+    };
 
+
+    if(employeesIsError){
+        return (
+            <div>
+                Ошибка загрузки сотрудников: {employeesError.message}
+            </div>
+        )
+    }
 
 return (
     <div>
@@ -102,6 +96,11 @@ return (
             allPpePositions={allPpePositions}
             allDivisions={allDivisions}
         />
+        {loading && (
+            <div className={'text-gray-500 mt-2'}>
+                Загрузка данных...
+            </div>
+        )}
     </div>
 )
 }

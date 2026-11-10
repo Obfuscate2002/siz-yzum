@@ -2,8 +2,8 @@
 import { useEffect, useState } from "react";
 import { Table, Drawer, Input, message } from "antd";
 import type { ColumnsType } from "antd/es/table";
-import {getPositions, type Position} from "../../hooks/usePositions.tsx";
 import {PositionPpeCard} from "./PositionPpeCard.tsx";
+import {getPositions, type Position} from "../../api/ppePositions.api.ts";
 
 
 export function PositionsTable() {

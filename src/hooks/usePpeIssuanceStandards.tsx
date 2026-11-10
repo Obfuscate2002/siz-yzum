@@ -1,11 +1,11 @@
-import {pb} from "../pocketbase/pocketbase.ts";
-import type {PpeIssuanceStandardExpanded} from "../types/ppeIssuanceStandards.ts";
+import {useQuery} from "@tanstack/react-query";
+import {getPpeIssuanceStandards} from "../api/ppeIssuanceStandards.api.ts";
 
+export const ppeIssuanceStandardsKey = ['ppe_issuance_standards']
 
-export const getPpeIssuanceStandards = async (): Promise<PpeIssuanceStandardExpanded[]> => {
-    const data = await pb.collection('ppe_issuance_standards').getFullList<PpeIssuanceStandardExpanded>({
-        requestKey: null,
-        expand: "position"
-    });
-    return data;
+export const usePpeIssuanceStandards = () => {
+    return useQuery({
+        queryKey: ppeIssuanceStandardsKey,
+        queryFn: getPpeIssuanceStandards
+    })
 }

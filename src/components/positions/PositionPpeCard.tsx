@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { Table, message } from "antd";
 import type { ColumnsType } from "antd/es/table";
-import {getPositionPpeStandards, type Position, type PpeIssuanceStandard} from "../../hooks/usePositions.tsx";
+import {getsPositionPpeStandards, type Position, type PpeIssuanceStandard} from "../../api/ppePositions.api.ts";
 
 
 interface Props {
@@ -22,7 +22,7 @@ export function PositionPpeCard({ position }: Props) {
             setStandards([]);
 
             try {
-                const data = await getPositionPpeStandards(position.id);
+                const data = await getsPositionPpeStandards(position.id);
 
                 if (!cancelled) {
                     setStandards(data);

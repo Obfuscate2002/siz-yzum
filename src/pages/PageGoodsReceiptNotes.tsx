@@ -1,28 +1,19 @@
-import {Button, DatePicker, Divider, Form, Input, message, Space, Table, Typography} from "antd";
+import {Button, DatePicker, Divider, Form, Input, Space, Table, Typography} from "antd";
 import {DeleteOutlined, EditOutlined, EyeOutlined, FileTextTwoTone, PlusOutlined, SearchOutlined, SyncOutlined} from "@ant-design/icons";
 import Text from "antd/es/typography/Text";
-import {useEffect, useState} from "react";
 import type {WarehouseReceiptItem} from "../types/WarehouseReceiptItem.ts";
-import {getWarehouseReceiptItems} from "../hooks/useWarehouseReceiptItems.tsx";
-import ImportExcelButton from "../components/settings/ImportExcelButton.tsx";
+import {useWarehouseReceiptItems} from "../hooks/useWarehouseReceiptItems.tsx";
 
 export const PageGoodsReceiptNotes = () => {
 
-    const [warehouseReceiptItems, setWarehouseReceiptItems] =useState<WarehouseReceiptItem[]>([]);
-
     const [form] = Form.useForm();
 
-    const loadData = async () => {
-        try {
-            setWarehouseReceiptItems(await getWarehouseReceiptItems())
-        } catch (error) {
-            message.error("Ошибка загрузки");
-        }
-    }
-
-    useEffect(() => {
-        void loadData();
-    }, [])
+    const {
+        data: warehouseReceiptItems = [],
+        isLoading,
+        isError,
+        error,
+    } = useWarehouseReceiptItems()
 
     const handleView = (record: WarehouseReceiptItem) => {
         console.log('Просмотр:', record);
@@ -135,6 +126,12 @@ export const PageGoodsReceiptNotes = () => {
         },
     ];
 
+    if(isError) {
+        return (
+            <Typography.Text type={'danger'}> Ошибка загрузки приходных накладных {error.message}</Typography.Text>
+        )
+    }
+
     return (
         <>
             <div className={'flex justify-between'}>
@@ -165,14 +162,19 @@ export const PageGoodsReceiptNotes = () => {
                     <div className={'flex flex-row gap-3 justify-center items-center'}>
                         <Button variant={'outlined'} color={'blue'}><SyncOutlined />Сбросить</Button>
                         <Button variant={'solid'} color={'blue'}><SearchOutlined />Найти</Button>
-                        <ImportExcelButton/>
+
                     </div>
 
                 </div>
             </Form>
             <Divider />
             <div>
-                <Table columns={columns} dataSource={warehouseReceiptItems} />
+                <Table
+                    rowKey={'id'}
+                    columns={columns}
+                    dataSource={warehouseReceiptItems}
+                    loading={isLoading}
+                />
             </div>
         </>
     )

@@ -8,11 +8,11 @@ import {
 import {UserOutlined} from "@ant-design/icons";
 import {useEffect, useState} from "react";
 import {Input, message} from "antd";
-import {getPpeIssuanceStandards} from "../../hooks/usePpeIssuanceStandards.tsx";
 import type {PpeIssuanceStandard} from "../../types/ppeIssuanceStandards.ts";
 import {PpeIssuanceStandardRecord} from "./PpeIssuanceStandardRecord.tsx";
 
 import {PpeIssuanceStandardModal} from "./PpeIssuanceStandardModal.tsx";
+import {getPpeIssuanceStandards} from "../../api/ppeIssuanceStandards.api.ts";
 
 const features = tableFeatures({
     columnFilteringFeature,

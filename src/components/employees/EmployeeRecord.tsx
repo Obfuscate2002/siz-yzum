@@ -15,11 +15,11 @@ import Text from "antd/es/typography/Text";
 import {EmployeeRecordTable} from "./EmployeeRecordTable.tsx";
 import type {Employee} from "../../types/employee.ts";
 import {useEffect, useState} from "react";
-import {deleteEmployee, updateEmployee} from "../../hooks/useEmployess.tsx";
 import type {PpeIssuanceStandardExpanded} from "../../types/ppeIssuanceStandards.ts";
 import type {ContractPosition} from "../../types/contractPositions.ts";
-import type {Position} from "../../hooks/usePositions.tsx";
 import type {Division} from "../../types/divisions.ts";
+import type { Position } from "../../api/ppePositions.api.ts";
+import {deleteEmployee, updateEmployee} from "../../api/employees.api.ts";
 interface EmployeeFormValues {
     fullName: string;
     position: string;
