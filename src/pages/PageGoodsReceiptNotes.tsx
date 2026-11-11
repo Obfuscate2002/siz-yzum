@@ -1,10 +1,21 @@
 import {Button, DatePicker, Divider, Form, Input, Space, Table, Typography} from "antd";
-import {DeleteOutlined, EditOutlined, EyeOutlined, FileTextTwoTone, PlusOutlined, SearchOutlined, SyncOutlined} from "@ant-design/icons";
+import {
+    DeleteOutlined,
+    EditOutlined,
+    EyeOutlined,
+    FileTextTwoTone,
+    PlusOutlined,
+    SearchOutlined,
+    SyncOutlined
+} from "@ant-design/icons";
 import Text from "antd/es/typography/Text";
 import type {WarehouseReceiptItem} from "../types/WarehouseReceiptItem.ts";
 import {useWarehouseReceiptItems} from "../hooks/useWarehouseReceiptItems.tsx";
+import {useNavigate} from "react-router";
 
 export const PageGoodsReceiptNotes = () => {
+
+    const navigate = useNavigate();
 
     const [form] = Form.useForm();
 
@@ -55,46 +66,6 @@ export const PageGoodsReceiptNotes = () => {
             },
         },
         {
-            title: 'Код товара/ работ, услуг',
-            dataIndex: 'productCode',
-            key: 'productCode',
-        },
-        {
-            title: 'Наименование товара (описание выполненных работ, оказанных услуг), имущественного права',
-            dataIndex: 'productName',
-            key: 'productName',
-        },
-        {
-            title: 'Ед. изм.',
-            dataIndex: 'unit',
-            key: 'unit',
-        },
-        {
-            title: 'Количество (объем)',
-            dataIndex: 'quantity',
-            key: 'quantity',
-        },
-        {
-            title: 'Цена (тариф)  за единицу измерения',
-            dataIndex: 'unitPrice',
-            key: 'unitPrice',
-        },
-        {
-            title: 'Стоимость товаров (работ,услуг), имущественных прав без налога - всего',
-            dataIndex: 'amountWithoutTax',
-            key: 'amountWithoutTax',
-        },
-        {
-            title: 'Налоговая ставка',
-            dataIndex: 'taxRate',
-            key: 'taxRate',
-        },
-        {
-            title: 'Сумма налога, предъявляемая покупателю',
-            dataIndex: 'taxAmount',
-            key: 'taxAmount',
-        },
-        {
             title: 'Стоимость товаров  (работ, услуг), имущественных прав с налогом - всего',
             dataIndex: 'amountWithTax',
             key: 'amountWithTax',
@@ -143,7 +114,13 @@ export const PageGoodsReceiptNotes = () => {
                     </div>
                 </div>
                 <div className={'flex justify-center items-center'}>
-                    <Button variant={'solid'} color={'blue'}><PlusOutlined />Добавить накладную</Button>
+                    <Button
+                        variant={'solid'}
+                        color={'blue'}
+                        onClick={() => navigate("/warehouse/goodsReceiptNotes/create")}
+                    >
+                        <PlusOutlined />Добавить накладную
+                    </Button>
                 </div>
             </div>
             <Divider />
