@@ -1,4 +1,4 @@
-import {Button, DatePicker, Divider, Form, Input, Space, Table, Typography} from "antd";
+import {Button, DatePicker, Divider, Form, Input, Space, Table, Typography, type TableColumnsType} from "antd";
 import {
     DeleteOutlined,
     EditOutlined,
@@ -9,9 +9,11 @@ import {
     SyncOutlined
 } from "@ant-design/icons";
 import Text from "antd/es/typography/Text";
-import type {WarehouseReceiptItem} from "../types/WarehouseReceiptItem.ts";
-import {useWarehouseReceiptItems} from "../hooks/useWarehouseReceiptItems.tsx";
 import {useNavigate} from "react-router";
+import {useWarehouseReceipts} from "../hooks/useWarehouseReceipts.tsx";
+import type {WarehouseReceipt} from "../api/warehouseReceipts.api.ts";
+import {ImportWarehouseReceiptsButton} from "../components/warehouseReceipt/ImportWarehouseReceiptsButton.tsx";
+import {useWarehouseReceiptItems} from "../hooks/useWarehouseReceiptItems.tsx";
 
 export const PageGoodsReceiptNotes = () => {
 
@@ -20,60 +22,93 @@ export const PageGoodsReceiptNotes = () => {
     const [form] = Form.useForm();
 
     const {
-        data: warehouseReceiptItems = [],
+        data: warehouseReceipts = [],
         isLoading,
         isError,
         error,
-    } = useWarehouseReceiptItems()
+    } = useWarehouseReceipts()
 
-    const handleView = (record: WarehouseReceiptItem) => {
+    const {
+        data: receiptItems = [],
+        isLoading: isItemsLoading,
+    } = useWarehouseReceiptItems();
+
+    const handleView = (record: WarehouseReceipt) => {
         console.log('Просмотр:', record);
     }
 
-    const handleEdit = (record: WarehouseReceiptItem) => {
+    const handleEdit = (record: WarehouseReceipt) => {
         console.log('Редактирование:', record);
     }
 
-    const handleDelete = (id: string) => {
-        console.log('Удаление:', id);
+    const handleDelete = (record: WarehouseReceipt) => {
+        console.log('Удаление:', record.id);
     }
 
 
 
-    const columns = [
+    const columns: TableColumnsType<WarehouseReceipt> = [
+        {
+            title: '№',
+            key: 'number',
+            width: 65,
+            render: (_value: unknown, _record: unknown, index: number) => index + 1,
+        },
         {
             title: 'Контрагент',
-            key: 'receipt',
-            render: (_: unknown, record: WarehouseReceiptItem) => {
-                return record.expand?.receipt?.counterparty ?? '-';
-            },
+            dataIndex: 'counterparty',
+            key: 'counterparty',
+            render: (_: unknown, record: WarehouseReceipt) => {
+                return record.expand?.counterparty?.name || '-'
+            }
         },
         {
             title: 'Документ прихода сч.ф.',
+            dataIndex: 'documentNumber',
             key: 'documentNumber',
-            render: (_: unknown, record: WarehouseReceiptItem) =>
-                record.expand?.receipt?.documentNumber ?? '-',
         },
         {
             title: 'Дата прихода',
+            dataIndex: 'receiptDate',
             key: 'receiptDate',
-            render: (_: unknown, record: WarehouseReceiptItem) => {
-                const date = record.expand?.receipt?.receiptDate;
-
-                return date
-                    ? new Date(date).toLocaleDateString('ru-RU')
-                    : '-';
-            },
+            render: (value: string) =>
+                value
+                    ? new Date(value).toLocaleDateString('ru-RU')
+                    : '-',
         },
         {
-            title: 'Стоимость товаров  (работ, услуг), имущественных прав с налогом - всего',
-            dataIndex: 'amountWithTax',
+            title: 'Стоимость товаров с налогом — всего',
             key: 'amountWithTax',
+            render: (_, record: WarehouseReceipt) => {
+                const items = receiptItems.filter(
+                    item => item.receipt === record.id
+                );
+
+                const total = items.reduce(
+                    (sum, item) => sum + Number(item.amountWithTax || 0),
+                    0
+                );
+
+                return (
+                    <div>
+                        <div>
+                            {total.toLocaleString('ru-RU', {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                            })}
+                        </div>
+                        <Text type="secondary" style={{ fontSize: 11 }}>
+                            Строк: {items.length}
+                        </Text>
+                    </div>
+                );
+            },
         },
         {
             title: 'Действия',
             key: 'actions',
-            render: (_: unknown, record: WarehouseReceiptItem) => (
+            width: 130,
+            render: (_value: unknown, record: WarehouseReceipt) => (
                 <Space>
                     <Button
                         type="text"
@@ -91,9 +126,10 @@ export const PageGoodsReceiptNotes = () => {
                         type="text"
                         danger
                         icon={<DeleteOutlined />}
-                        onClick={() => handleDelete(record.id)}/>
+                        onClick={() => handleDelete(record)}
+                    />
                 </Space>
-            )
+            ),
         },
     ];
 
@@ -102,6 +138,8 @@ export const PageGoodsReceiptNotes = () => {
             <Typography.Text type={'danger'}> Ошибка загрузки приходных накладных {error.message}</Typography.Text>
         )
     }
+
+
 
     return (
         <>
@@ -123,6 +161,7 @@ export const PageGoodsReceiptNotes = () => {
                     </Button>
                 </div>
             </div>
+
             <Divider />
             <Form form={form} layout={'vertical'}>
                 <div className={'flex flex-row gap-5'}>
@@ -137,20 +176,27 @@ export const PageGoodsReceiptNotes = () => {
                         <DatePicker/>
                     </Form.Item>
                     <div className={'flex flex-row gap-3 justify-center items-center'}>
-                        <Button variant={'outlined'} color={'blue'}><SyncOutlined />Сбросить</Button>
+                        <Button
+                            variant={'outlined'}
+                            color={'blue'}
+                            onClick={() => form.resetFields()}
+                        >
+                            <SyncOutlined />Сбросить
+                        </Button>
                         <Button variant={'solid'} color={'blue'}><SearchOutlined />Найти</Button>
 
                     </div>
 
                 </div>
             </Form>
+            <ImportWarehouseReceiptsButton/>
             <Divider />
             <div>
                 <Table
                     rowKey={'id'}
                     columns={columns}
-                    dataSource={warehouseReceiptItems}
-                    loading={isLoading}
+                    dataSource={warehouseReceipts}
+                    loading={isLoading || isItemsLoading}
                 />
             </div>
         </>

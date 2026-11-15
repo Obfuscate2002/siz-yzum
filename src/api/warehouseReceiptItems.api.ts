@@ -5,7 +5,8 @@ import type {WarehouseReceiptItem} from "../types/WarehouseReceiptItem.ts";
 
 export const getWarehouseReceiptItems = async (): Promise<WarehouseReceiptItem[]> => {
     const data = pb.collection('warehouse_receipt_items').getFullList<WarehouseReceiptItem>({
-        expand: 'receipt, nomenclature'
+        expand: "receipt,nomenclature",
+        sort: "-created",
     })
 
     return data

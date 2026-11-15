@@ -1,9 +1,35 @@
-import {DatePicker, Form, Input, Row, Select} from "antd";
+import {DatePicker, Form, type FormInstance, Input, Row, Select} from "antd";
+import {useCounterparties} from "../../hooks/useCounterparties.ts";
 
-export const WarehouseReceiptDetailsForm = () => {
+
+export interface WarehouseReceiptDetailsValues {
+    documentNumber: string;
+    receiptDate: import("dayjs").Dayjs;
+    counterparty: string;
+    basis?: string;
+}
+
+interface WarehouseReceiptDetailsFormProps {
+    form: FormInstance<WarehouseReceiptDetailsValues>
+}
+
+export const WarehouseReceiptDetailsForm = ({form}: WarehouseReceiptDetailsFormProps) => {
+
+    const {
+        data: counterparties = [],
+        isLoading,
+        isError,
+    } = useCounterparties()
+
+
+    const options = counterparties.map((item => ({
+        value: item.id,
+        label: `${item.name} (ИНН: ${item.inn}, КПП: ${item.kpp})`,
+        searchText: `${item.name} ${item.inn} ${item.kpp}`.toLowerCase(),
+    })))
 
     return (
-        <Form layout="vertical">
+        <Form form={form} layout="vertical">
             <Row className="gap-10">
                 <Form.Item
                     name="documentNumber"
@@ -15,7 +41,7 @@ export const WarehouseReceiptDetailsForm = () => {
                 <Form.Item
                     name="receiptDate"
                     label="Дата документа"
-                    rules={[{required: true, message: 'Введите В'}]}>
+                    rules={[{required: true, message: 'Введите дату'}]}>
                     <DatePicker
                         className="w-full"
                         format="DD.MM.YYYY"
@@ -24,6 +50,7 @@ export const WarehouseReceiptDetailsForm = () => {
                 <Form.Item
                     label="Контрагент"
                     name="counterparty"
+                    className="min-w-[700px]"
                     rules={[
                         {
                             required: true,
@@ -31,7 +58,20 @@ export const WarehouseReceiptDetailsForm = () => {
                         },
                     ]}
                 >
-                    <Select placeholder={'Выберите контрагента'}/>
+                    <Select
+                        showSearch
+                        placeholder={'Выберите контрагента'}
+                        loading={isLoading}
+                        disabled={isError}
+                        options={options}
+                        notFoundContent={
+                            isError
+                                ? 'Ошибка загрузки контрагентов'
+                                : isLoading
+                                    ? 'Загрузка'
+                                    : 'Контрагенты не найдены'
+                        }
+                    />
                 </Form.Item>
             </Row>
 

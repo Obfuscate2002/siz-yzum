@@ -1,12 +1,12 @@
-
-import { useState } from 'react';
-import { Button, Input, InputNumber, Table, Typography } from 'antd';
+import {Button, Input, InputNumber, Select, Table, Typography} from 'antd';
 import type { TableColumnsType } from 'antd';
 import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
+import {useWarehouseNomenclature} from "../../hooks/useWarehouseNomenclature.tsx";
 
 // Тип одной товарной позиции
-interface ReceiptItem {
+export interface ReceiptItem {
     id: string;
+    nomenclatureId: string;
     name: string;
     code: string;
     unit: string;
@@ -15,30 +15,29 @@ interface ReceiptItem {
     taxRate: number;
 }
 
-export const WarehouseReceiptItemsTable = () => {
+interface WarehouseReceiptItemsTableProps {
+    dataSource: ReceiptItem[];
+    onChange: (items: ReceiptItem[]) => void;
+}
 
-    // Состояние товарных позиций
-    const [dataSource, setDataSource] = useState<ReceiptItem[]>([
-        {
-            id: '1',
-            name: 'Перчатки',
-            code: '001',
-            unit: 'шт.',
-            quantity: 10,
-            price: 100,
-            taxRate: 20,
-        },
-    ]);
+export const WarehouseReceiptItemsTable = ({dataSource, onChange}: WarehouseReceiptItemsTableProps) => {
+
+
+    const {
+        data: nomenclature = [],
+        isLoading,
+    } = useWarehouseNomenclature();
 
     // Удаление позиции
     const handleDelete = (id: string): void => {
-        setDataSource(prev => prev.filter(item => item.id !== id));
+        onChange(dataSource.filter((item) => item.id === id));
     };
 
     // Добавление позиции
     const handleAdd = (): void => {
         const newItem: ReceiptItem = {
-            id: crypto.randomUUID(),
+            id: `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
+            nomenclatureId: '',
             name: '',
             code: '',
             unit: '',
@@ -47,17 +46,43 @@ export const WarehouseReceiptItemsTable = () => {
             taxRate: 20,
         };
 
-        setDataSource(prev => [...prev, newItem]);
+        onChange([...dataSource, newItem]);
     };
 
+    const handleNomenclatureChange = (
+        itemId: string,
+        nomenclatureId: string | undefined): void => {
+
+        const selected = nomenclature.find((item) => item.id === nomenclatureId)
+
+        onChange(dataSource.map(item => item.id === itemId
+            ?
+            {...item,
+                nomenclatureId: selected?.id ?? "",
+                name: selected?.name ?? "",
+                code: selected?.productCode ?? "",
+                unit: selected?.unit ?? "",
+            } : item))
+
+    }
+
     // Изменение значения позиции
-    const handleChange = (
+    const handleTextChange = (
         id: string,
-        field: keyof ReceiptItem,
-        value: string | number | null
+        field: "name" | "code" | "unit",
+        value: string
     ): void => {
-        setDataSource(prev =>
-            prev.map(item =>
+        onChange(dataSource.map((item) => item.id === id ? {...item, [field]: value} : item));
+    };
+
+    // Изменение числовых значений
+    const handleNumberChange = (
+        id: string,
+        field: "quantity" | "price" | "taxRate",
+        value: number | null
+    ): void => {
+        onChange(
+            dataSource.map(item =>
                 item.id === id
                     ? { ...item, [field]: value ?? 0 }
                     : item
@@ -66,103 +91,124 @@ export const WarehouseReceiptItemsTable = () => {
     };
 
     // Колонки таблицы с типизацией
-    const columns: TableColumnsType<ReceiptItem> = [
+    const columns: TableColumnsType<ReceiptItem> =  [
         {
-            title: '№',
-            key: 'number',
+            title: "№",
+            key: "number",
+            width: 60,
             render: (_value, _record, index) => index + 1,
         },
         {
-            title: 'Номенклатура',
-            dataIndex: 'name',
-            key: 'name',
-            render: (value: string, record: ReceiptItem) => (
-                <Input
-                    value={value}
-                    placeholder="Наименование товара"
-                    onChange={e =>
-                        handleChange(record.id, 'name', e.target.value)
-                    }
+            title: "Номенклатура",
+            dataIndex: "name",
+            key: "name",
+            width: 500,
+            render: (_: unknown, record: ReceiptItem) => (
+                <Select
+                    allowClear
+                    className="min-w-[500px]"
+                    loading={isLoading}
+                    placeholder="Выберите номенклатуру"
+                    value={record.nomenclatureId || undefined}
+                    options={nomenclature.map(item => ({
+                        value: item.id,
+                        label: item.name,
+                    }))}
+                    labelRender={({ label }) => (
+                        <div className="whitespace-normal break-words">
+                            {label}
+                        </div>
+                    )}
+                    onChange={value => handleNomenclatureChange(record.id, value)}
+                    styles={{
+                        popup: {
+                            root: {
+                                maxWidth: 500,
+                            },
+                        },
+                    }}
                 />
-            ),
+            )
         },
         {
-            title: 'Код',
-            dataIndex: 'code',
-            key: 'code',
-            render: (value: string, record: ReceiptItem) => (
+            title: "Код",
+            dataIndex: "code",
+            key: "code",
+            render: (_: unknown, record) => (
                 <Input
-                    value={value}
+                    value={record.code}
+                    disabled={!!record.nomenclatureId}
                     placeholder="Код"
                     onChange={e =>
-                        handleChange(record.id, 'code', e.target.value)
+                        handleTextChange(record.id, "code", e.target.value)
                     }
                 />
             ),
         },
         {
-            title: 'Ед. изм.',
-            dataIndex: 'unit',
-            key: 'unit',
-            render: (value: string, record: ReceiptItem) => (
+            title: "Ед. изм.",
+            dataIndex: "unit",
+            key: "unit",
+            render: (_: unknown, record) => (
                 <Input
-                    value={value}
+                    value={record.unit}
+                    disabled={!!record.nomenclatureId}
                     placeholder="шт."
                     onChange={e =>
-                        handleChange(record.id, 'unit', e.target.value)
+                        handleTextChange(record.id, "unit", e.target.value)
                     }
                 />
             ),
         },
         {
-            title: 'Количество',
-            dataIndex: 'quantity',
-            key: 'quantity',
-            render: (value: number, record: ReceiptItem) => (
+            title: "Количество",
+            dataIndex: "quantity",
+            key: "quantity",
+            render: (value: number, record) => (
                 <InputNumber
                     min={0}
                     value={value}
                     className="w-full"
                     onChange={value =>
-                        handleChange(record.id, 'quantity', value)
+                        handleNumberChange(record.id, "quantity", value)
                     }
                 />
             ),
         },
         {
-            title: 'Цена, ₽',
-            dataIndex: 'price',
-            key: 'price',
-            render: (value: number, record: ReceiptItem) => (
+            title: "Цена, ₽",
+            dataIndex: "price",
+            key: "price",
+            render: (value: number, record) => (
                 <InputNumber
                     min={0}
                     value={value}
                     className="w-full"
                     onChange={value =>
-                        handleChange(record.id, 'price', value)
+                        handleNumberChange(record.id, "price", value)
                     }
                 />
             ),
         },
         {
-            title: 'НДС, %',
-            dataIndex: 'taxRate',
-            key: 'taxRate',
-            render: (value: number, record: ReceiptItem) => (
+            title: "НДС, %",
+            dataIndex: "taxRate",
+            key: "taxRate",
+            render: (value: number, record) => (
                 <InputNumber
                     min={0}
                     max={100}
                     value={value}
                     className="w-full"
                     onChange={value =>
-                        handleChange(record.id, 'taxRate', value)
+                        handleNumberChange(record.id, "taxRate", value)
                     }
                 />
             ),
         },
         {
-            title: 'Сумма с НДС, ₽',
-            key: 'amountWithTax',
+            title: "Сумма с НДС, ₽",
+            key: "amountWithTax",
             render: (_value, record) => {
                 const amount = record.quantity * record.price;
                 const tax = amount * record.taxRate / 100;
@@ -171,8 +217,8 @@ export const WarehouseReceiptItemsTable = () => {
             },
         },
         {
-            title: 'Действия',
-            key: 'action',
+            title: "Действия",
+            key: "action",
             width: 80,
             render: (_value, record) => (
                 <Button

@@ -1,7 +1,11 @@
-import {message, Table} from "antd";
+import {message, Table, Typography} from "antd";
 import {useEffect, useState} from "react";
 import type {WarehouseNomenclature} from "../types/WarehouseNomenclature.ts";
 import {getWarehouseNomenclatures} from "../hooks/useWarehouseNomenclatures.ts";
+import {
+    ImportWarehouseNomenclatureButton
+} from "../components/warehouseNomenclature/ImportWarehouseNomenclatureButton.tsx";
+import {FileTextTwoTone} from "@ant-design/icons";
 
 export const PageWarehouseNomenclature = () => {
 
@@ -50,6 +54,13 @@ export const PageWarehouseNomenclature = () => {
     ];
 
     return (
-        <Table dataSource={warehouseNomenclatures} columns={columns} />
+        <div className={'flex flex-col gap-3'}>
+            <Typography.Title level={1}><FileTextTwoTone /> Справочник номенклатуры</Typography.Title>
+            <div>
+                <ImportWarehouseNomenclatureButton/>
+            </div>
+            <Table dataSource={warehouseNomenclatures} columns={columns} />
+        </div>
+
     )
 }

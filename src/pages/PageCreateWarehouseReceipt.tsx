@@ -1,68 +1,122 @@
-import {Button, Typography} from "antd";
-import {
-    DoubleLeftOutlined,
-    FileAddTwoTone,
-    FileTextTwoTone, MehTwoTone, SaveOutlined,
-} from "@ant-design/icons";
-import {useNavigate} from "react-router";
-import {WarehouseReceiptDetailsForm} from "../components/warehouseReceipt/WarehouseReceiptDetailsForm.tsx";
-import {WarehouseReceiptItemsTable} from "../components/warehouseReceipt/WarehouseReceiptItemsTable.tsx";
 
+import { useState } from "react";
+import {Button, Divider, Form, message, Typography} from "antd";
+import { useNavigate } from "react-router";
+import { useQueryClient } from "@tanstack/react-query";
+
+import {
+    WarehouseReceiptDetailsForm,
+    type WarehouseReceiptDetailsValues,
+} from "../components/warehouseReceipt/WarehouseReceiptDetailsForm";
+
+import {
+    WarehouseReceiptItemsTable,
+    type ReceiptItem,
+} from "../components/warehouseReceipt/WarehouseReceiptItemsTable";
+
+import { createWarehouseReceipt } from "../api/warehouseReceipts.api";
+import { warehouseReceiptsKey } from "../hooks/useWarehouseReceipts";
+import {FileAddTwoTone} from "@ant-design/icons";
 
 export const PageCreateWarehouseReceipt = () => {
-
     const navigate = useNavigate();
+    const queryClient = useQueryClient();
+
+    const [form] = Form.useForm<WarehouseReceiptDetailsValues>();
+
+    const [items, setItems] = useState<ReceiptItem[]>([]);
+    const [isSaving, setIsSaving] = useState(false);
+
+    const handleSave = async () => {
+        try {
+            // Проверяем реквизиты накладной
+            const values = await form.validateFields();
+
+            // Проверяем наличие товаров
+            if (items.length === 0) {
+                message.warning("Добавьте хотя бы одну товарную позицию");
+                return;
+            }
+
+            // Проверяем заполнение товарных строк
+            const hasEmptyItems = items.some(
+                item =>
+                    !item.name.trim() ||
+                    !item.code.trim() ||
+                    !item.unit.trim()
+            );
+
+            if (hasEmptyItems) {
+                message.warning(
+                    "Заполните наименование, код и единицу измерения товаров"
+                );
+                return;
+            }
+
+            // Проверяем количество
+            const hasInvalidQuantity = items.some(
+                item => item.quantity <= 0
+            );
+
+            if (hasInvalidQuantity) {
+                message.warning("Количество товара должно быть больше нуля");
+                return;
+            }
+
+            setIsSaving(true);
+
+            // Сохраняем накладную и её товары
+            await createWarehouseReceipt(values, items);
+
+            // Обновляем кэш списка накладных
+            await queryClient.invalidateQueries({
+                queryKey: warehouseReceiptsKey,
+            });
+
+            message.success("Приходная накладная успешно создана");
+
+            navigate("/warehouse/goodsReceiptNotes/");
+
+        } catch (error) {
+            console.error("Ошибка сохранения накладной:", error);
+
+            message.error(
+                error instanceof Error
+                    ? error.message
+                    : "Не удалось сохранить приходную накладную"
+            );
+        } finally {
+            setIsSaving(false);
+        }
+    };
 
     return (
-        <div className={'flex flex-col gap-3'}>
-            <div >
+        <div className="flex flex-col gap-5">
+            <Typography.Title level={1}><FileAddTwoTone /> Добавление приходной накладной</Typography.Title>
+            <WarehouseReceiptDetailsForm form={form} />
+            <WarehouseReceiptItemsTable
+                dataSource={items}
+                onChange={setItems}
+            />
+            <Divider/>
+
+            <div className="flex justify-end gap-3">
                 <Button
-                    variant={'link'}
-                    color={'geekblue'}
-                    onClick={() => {
-                        navigate('/warehouse/goodsReceiptNotes/')
-                    }}
-                >
-                    <DoubleLeftOutlined/>Вернуться назад
-                </Button>
-            </div>
-
-            <div>
-                <Typography.Title level={2}><FileAddTwoTone /> Добавление приходной накладной</Typography.Title>
-            </div>
-
-            <div className={'flex flex-col gap-1 border border-blue-300 rounded-lg'}>
-                <div className={'flex bg-blue-300/20 p-3'}>
-                    <Typography.Title level={3}><FileTextTwoTone /> Реквизиты накладной</Typography.Title>
-                </div>
-                <div className={'flex flex-row p-3 gap-3'}>
-                    <WarehouseReceiptDetailsForm/>
-                </div>
-            </div>
-            <div className={'flex flex-col border border-blue-300 rounded-lg'}>
-                <div className={'flex bg-blue-300/20 p-3'}>
-                    <Typography.Title level={3}><MehTwoTone /> Товары</Typography.Title>
-                </div>
-                <div className={'pt-3 pb-1'}>
-                    <WarehouseReceiptItemsTable/>
-                </div>
-
-            </div>
-            <div className={'flex justify-between px-3'}>
-                <Button
-                    variant={'outlined'}
-                    color={'geekblue'}
+                    disabled={isSaving}
+                    onClick={() => navigate("/warehouse/goodsReceiptNotes/")}
                 >
                     Отмена
                 </Button>
+
                 <Button
-                    className={'p-5'}
-                    variant={'solid'}
-                    color={'geekblue'}
+                    type="primary"
+                    loading={isSaving}
+                    onClick={handleSave}
                 >
-                    <SaveOutlined />Сохранить накладную
+                    Сохранить и добавить
                 </Button>
             </div>
+
         </div>
-    )
-}
+    );
+};
