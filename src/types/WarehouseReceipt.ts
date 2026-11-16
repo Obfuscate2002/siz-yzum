@@ -7,6 +7,13 @@ export interface WarehouseReceipt {
     status: ReceiptStatus;
     created: string;
     updated: string;
+
+    expand?: {
+        counterparty?: {
+            id: string;
+            name: string;
+        }
+    }
 }
 
 export type ReceiptStatus =

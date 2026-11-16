@@ -130,3 +130,7 @@ export const createWarehouseReceipt = async (
         throw error;
     }
 };
+
+export const deleteWarehouseReceipt = async (id: string) => {
+    await pb.collection("warehouse_receipts").delete(id);
+};

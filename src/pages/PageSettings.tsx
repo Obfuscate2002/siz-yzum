@@ -11,6 +11,7 @@ import {LinkEmployeeRelations} from "../components/settings/LinkEmployeeRelation
 import {ImportPpeStandards} from "../components/settings/importPpeStandards.tsx";
 import ImportExcelButton from "../components/settings/ImportExcelButton.tsx";
 import RestoreWarehouseReceiptLinksButton from "../components/warehouseReceipt/RestoreWarehouseReceiptLinksButton.tsx";
+import {ReceiptItemsMatcher} from "../components/settings/ReceiptItemsMatcher.tsx";
 
 export const PageSettings = () => {
 
@@ -77,6 +78,9 @@ export const PageSettings = () => {
                     <div>
                         15.11.2026
                         <RestoreWarehouseReceiptLinksButton pb={pb} />
+                    </div>
+                    <div>
+                        <ReceiptItemsMatcher pb={pb}/>
                     </div>
                 </div>
 

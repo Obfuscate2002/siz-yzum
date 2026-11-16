@@ -17,6 +17,7 @@ import {
 import { createWarehouseReceipt } from "../api/warehouseReceipts.api";
 import { warehouseReceiptsKey } from "../hooks/useWarehouseReceipts";
 import {FileAddTwoTone} from "@ant-design/icons";
+import {warehouseReceiptItemsKey} from "../hooks/useWarehouseReceiptItems.tsx";
 
 export const PageCreateWarehouseReceipt = () => {
     const navigate = useNavigate();
@@ -72,6 +73,10 @@ export const PageCreateWarehouseReceipt = () => {
             await queryClient.invalidateQueries({
                 queryKey: warehouseReceiptsKey,
             });
+
+            await queryClient.invalidateQueries({
+                queryKey: warehouseReceiptItemsKey,
+            })
 
             message.success("Приходная накладная успешно создана");
 

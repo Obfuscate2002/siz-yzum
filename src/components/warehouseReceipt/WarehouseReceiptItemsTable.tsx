@@ -43,7 +43,7 @@ export const WarehouseReceiptItemsTable = ({dataSource, onChange}: WarehouseRece
             unit: '',
             quantity: 1,
             price: 0,
-            taxRate: 20,
+            taxRate: 22,
         };
 
         onChange([...dataSource, newItem]);
