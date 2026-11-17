@@ -27,7 +27,8 @@ export interface PpeIssuanceStatementItem {
         },
         employee?: {
             id: string;
-            name: string;
+            fullName: string;
+            personnelNumber: string;
         }
 
     }

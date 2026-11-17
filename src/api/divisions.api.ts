@@ -10,7 +10,7 @@ interface UpdateDivisionData {
 export const getDivisions = async (): Promise<Division[]> => {
     const data = await pb.collection('divisions').getFullList<Division>({
         requestKey: null,
-        expand: 'ppe_positions, contract_positions'
+        expand: 'ppe_positions,contract_positions'
     })
     return data
 }

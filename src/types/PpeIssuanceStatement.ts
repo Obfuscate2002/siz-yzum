@@ -1,7 +1,7 @@
 export interface PpeIssuanceStatement {
     id: string;
     statementNumber: string;
-    statementDate: Date;
+    statementDate: string;
     division: string;
     responsibleEmployee: string;
     basis: string;

@@ -2,8 +2,8 @@ import type {PpeIssuanceStatementItem} from "../types/PpeIssuanceStatementItem.t
 import {pb} from "../pocketbase/pocketbase.ts";
 
 export const getPpeIssuanceStatementItems = async (): Promise<PpeIssuanceStatementItem[]> => {
-    const data = await pb.collection('ppe_issuance_statement_items').getFullList<PpeIssuanceStatementItem>({
-        expand: 'statement, employee, warehouse_nomenclature, contractPosition'
-    })
-    return data
-}
+    return await pb.collection("ppe_issuance_statement_items").getFullList<PpeIssuanceStatementItem>({
+        expand: "statement, employee, warehouse_nomenclature, contractPosition",
+        requestKey: null,
+    });
+};
