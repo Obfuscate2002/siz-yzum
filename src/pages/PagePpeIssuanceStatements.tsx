@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import type { Dayjs } from "dayjs";
 import {
@@ -14,6 +13,7 @@ import {
     message,
     Space,
     Divider,
+    Spin,
 } from "antd";
 import {
     FileTextTwoTone,
@@ -27,14 +27,11 @@ import type { PpeIssuanceStatementItem } from "../types/PpeIssuanceStatementItem
 
 import { getDivisions } from "../api/divisions.api.ts";
 import { getEmployes } from "../api/employees.api.ts";
-
 import {
     getWarehouseNomenclature,
+    type WarehouseNomenclature,
 } from "../api/warehouseNomenclature.api.ts";
 
-import type {
-    WarehouseNomenclature,
-} from "../api/warehouseNomenclature.api.ts";
 import type { Division } from "../types/divisions.ts";
 import type { Employee } from "../types/employee.ts";
 
@@ -54,19 +51,21 @@ import {
     type Position,
     type PpeIssuanceStandard,
 } from "../api/ppePositions.api.ts";
+import {PpeIssuanceStatementPrint} from "../components/ppeIssuanceStatementPrint/PpeIssuanceStatementPrint.tsx";
+
+// --------------------------------------------------
+// Типы форм
+// --------------------------------------------------
 
 type StatementFormValues = {
     statementNumber: string;
     statementDate: Dayjs;
     division: string;
-    responsibleEmployee: string;
-    basis: string;
+    employee: string;
 };
 
 type StatementItemFormValue = {
-    employee: string;
-    contractPosition: string;
-    ppePosition: string;
+    nomenclature: string;
     warehouse_nomenclature: string;
     quantity: number;
     unit: string;
@@ -79,9 +78,49 @@ type ItemsFormValues = {
     items: StatementItemFormValue[];
 };
 
+// --------------------------------------------------
+// Вспомогательные функции
+// --------------------------------------------------
+
+// Перевод срока из поля issuance_period в месяцы.
+// Например: "1 год" -> 12, "1 месяц" -> 1.
+const getWearPeriodInMonths = (
+    issuancePeriod?: string
+): number | undefined => {
+    if (!issuancePeriod) return undefined;
+
+    const value = issuancePeriod.toLowerCase().trim();
+
+    const numberMatch = value.match(/\d+/);
+    const amount = numberMatch ? Number(numberMatch[0]) : 1;
+
+    if (/год|лет/.test(value)) {
+        return amount * 12;
+    }
+
+    if (/месяц/.test(value)) {
+        return amount;
+    }
+
+    if (/недел/.test(value)) {
+        return undefined;
+    }
+
+    if (/дн|сут/.test(value)) {
+        return undefined;
+    }
+
+    return undefined;
+};
+
+// --------------------------------------------------
+// Основной компонент
+// --------------------------------------------------
+
 export const PagePpeIssuanceStatements = () => {
     const [statements, setStatements] = useState<PpeIssuanceStatement[]>([]);
     const [statementItems, setStatementItems] = useState<PpeIssuanceStatementItem[]>([]);
+
     const [divisions, setDivisions] = useState<Division[]>([]);
     const [employees, setEmployees] = useState<Employee[]>([]);
     const [positions, setPositions] = useState<Position[]>([]);
@@ -90,6 +129,9 @@ export const PagePpeIssuanceStatements = () => {
     const [selectedDivision, setSelectedDivision] = useState<string>();
     const [selectedStatement, setSelectedStatement] =
         useState<PpeIssuanceStatement | null>(null);
+
+    const [standards, setStandards] = useState<PpeIssuanceStandard[]>([]);
+    const [isLoadingStandards, setIsLoadingStandards] = useState(false);
 
     const [isLoading, setIsLoading] = useState(false);
     const [isRefreshingItems, setIsRefreshingItems] = useState(false);
@@ -103,16 +145,32 @@ export const PagePpeIssuanceStatements = () => {
     const [itemsForm] = Form.useForm<ItemsFormValues>();
 
     const formDivision = Form.useWatch("division", statementForm);
+    const formEmployee = Form.useWatch("employee", statementForm);
 
+    // Сотрудники выбранного подразделения
     const divisionEmployees = employees.filter(
         employee => employee.division === formDivision
     );
 
-    const statementEmployees = employees.filter(
-        employee => employee.division === selectedStatement?.division
+    // Сотрудник, на которого открыта ведомость
+    const selectedEmployee = employees.find(
+        employee => employee.id === selectedStatement?.employee
     );
 
+    // Ведомости выбранного подразделения
+    const divisionStatements = statements.filter(
+        statement => statement.division === selectedDivision
+    );
+
+    // Строки открытой ведомости
+    const selectedStatementItems = statementItems.filter(
+        item => item.statement === selectedStatement?.id
+    );
+
+    // --------------------------------------------------
     // Загрузка данных
+    // --------------------------------------------------
+
     useEffect(() => {
         const loadData = async () => {
             setIsLoading(true);
@@ -151,7 +209,10 @@ export const PagePpeIssuanceStatements = () => {
         void loadData();
     }, []);
 
-    // Создание ведомости
+    // --------------------------------------------------
+    // Создание ведомости на сотрудника
+    // --------------------------------------------------
+
     const handleCreateStatement = async (values: StatementFormValues) => {
         try {
             setIsSaving(true);
@@ -160,8 +221,7 @@ export const PagePpeIssuanceStatements = () => {
                 statementNumber: values.statementNumber,
                 statementDate: values.statementDate.toISOString(),
                 division: values.division,
-                responsibleEmployee: values.responsibleEmployee,
-                basis: values.basis,
+                employee: values.employee,
                 status: "draft",
             });
 
@@ -173,28 +233,100 @@ export const PagePpeIssuanceStatements = () => {
             statementForm.resetFields();
 
             message.success("Ведомость создана");
-        } catch (error) {
-            console.error(error);
-            message.error("Не удалось создать ведомость");
+        } catch (error: any) {
+            console.error("Ошибка создания ведомости:", error);
+            console.error("Ответ PocketBase:", error?.data);
+
+            message.error(
+                error?.data?.data?.employee?.message ??
+                error?.message ??
+                "Не удалось создать ведомость"
+            );
         } finally {
             setIsSaving(false);
         }
     };
 
-    // Ведомости выбранного подразделения
-    const divisionStatements = statements.filter(
-        statement => statement.division === selectedDivision
-    );
+    // --------------------------------------------------
+    // Открытие формы добавления норм СИЗ
+    // --------------------------------------------------
 
-    // Строки открытой ведомости
-    const selectedStatementItems = statementItems.filter(
-        item => item.statement === selectedStatement?.id
-    );
+    const openAddItemsModal = async () => {
+        if (!selectedEmployee) {
+            message.error("Не удалось определить сотрудника ведомости");
+            return;
+        }
 
+        const ppePositionId = selectedEmployee.positionRelation;
+
+        if (!ppePositionId) {
+            message.warning("У сотрудника не указана должность по СИЗ");
+            return;
+        }
+
+        setIsAddItemsModalOpen(true);
+        setIsLoadingStandards(true);
+        setStandards([]);
+
+        try {
+            const data = await getsPositionPpeStandards(ppePositionId);
+
+            setStandards(data);
+
+            if (data.length === 0) {
+                itemsForm.setFieldsValue({ items: [] });
+                message.info("Для должности сотрудника нормы СИЗ не найдены");
+                return;
+            }
+
+            const initialItems: StatementItemFormValue[] = data.map(standard => {
+                const wearPeriod = getWearPeriodInMonths(
+                    standard.issuance_period
+                );
+
+                return {
+                    nomenclature: standard.ppe_name,
+                    warehouse_nomenclature: "",
+                    quantity: 1,
+                    unit: "",
+                    wearPeriod,
+                    wearPeriodUnit: wearPeriod ? "month" : undefined,
+                    comment: [
+                        standard.issuance_norm
+                            ? `Норма: ${standard.issuance_norm}`
+                            : "",
+                        standard.issuance_basis
+                            ? `Основание нормы: ${standard.issuance_basis}`
+                            : "",
+                    ]
+                        .filter(Boolean)
+                        .join(". "),
+                };
+            });
+
+            itemsForm.setFieldsValue({
+                items: initialItems,
+            });
+        } catch (error) {
+            console.error(error);
+            message.error("Не удалось загрузить нормы СИЗ");
+        } finally {
+            setIsLoadingStandards(false);
+        }
+    };
+
+    // --------------------------------------------------
     // Сохранение строк ведомости
+    // --------------------------------------------------
+
     const handleAddStatementItems = async (values: ItemsFormValues) => {
-        if (!selectedStatement) {
-            message.error("Сначала откройте ведомость");
+        if (!selectedStatement || !selectedEmployee) {
+            message.error("Не удалось определить ведомость или сотрудника");
+            return;
+        }
+
+        if (!values.items?.length) {
+            message.warning("Добавьте хотя бы одну позицию");
             return;
         }
 
@@ -203,21 +335,30 @@ export const PagePpeIssuanceStatements = () => {
 
             const itemsToSave = values.items.map(item => ({
                 statement: selectedStatement.id,
-                employee: item.employee,
-                nomenclature: item.warehouse_nomenclature,
+                employee: selectedEmployee.id,
+
+                // Наименование из нормы СИЗ
+                nomenclature: item.nomenclature,
+
+                // Выбранная номенклатура складского учёта
                 warehouse_nomenclature: item.warehouse_nomenclature,
+
                 quantity: item.quantity,
                 unit: item.unit,
-                contractPosition: item.contractPosition,
+
+                // Должность по трудовому договору сотрудника
+                contractPosition: selectedEmployee.contractPosition,
+
                 wearPeriod: item.wearPeriod,
                 wearPeriodUnit: item.wearPeriodUnit,
                 comment: item.comment,
             }));
-
-            // Сохраняем позиции в PocketBase
+            console.log(
+                "Все данные для сохранения ведомости:",
+                JSON.stringify(itemsToSave, null, 2)
+            );
             await createPpeIssuanceStatementItems(itemsToSave);
 
-            // Обновляем данные таблицы после сохранения
             setIsRefreshingItems(true);
 
             const updatedItems = await getPpeIssuanceStatementItems();
@@ -233,6 +374,7 @@ export const PagePpeIssuanceStatements = () => {
 
             message.error(
                 error?.data?.data?.contractPosition?.message ??
+                error?.data?.data?.warehouse_nomenclature?.message ??
                 error?.message ??
                 "Не удалось добавить позиции"
             );
@@ -242,7 +384,10 @@ export const PagePpeIssuanceStatements = () => {
         }
     };
 
+    // --------------------------------------------------
     // Колонки ведомостей
+    // --------------------------------------------------
+
     const statementColumns: ColumnsType<PpeIssuanceStatement> = [
         {
             title: "Номер ведомости",
@@ -257,11 +402,28 @@ export const PagePpeIssuanceStatements = () => {
                 date ? new Date(date).toLocaleDateString("ru-RU") : "-",
         },
         {
-            title: "Ответственный",
-            dataIndex: "responsibleEmployee",
-            key: "responsibleEmployee",
-            render: (id: string) =>
-                employees.find(employee => employee.id === id)?.fullName ?? "-",
+            title: "Сотрудник",
+            key: "employee",
+            render: (_: unknown, record) => {
+                const employee = employees.find(
+                    item => item.id === record.employee
+                );
+
+                return employee?.fullName ?? record.expand?.employee?.fullName ?? "-";
+            },
+        },
+        {
+            title: "Табельный номер",
+            key: "personnelNumber",
+            render: (_: unknown, record) => {
+                const employee = employees.find(
+                    item => item.id === record.employee
+                );
+
+                return employee?.personnelNumber ??
+                    record.expand?.employee?.personnelNumber ??
+                    "-";
+            },
         },
         {
             title: "Статус",
@@ -282,28 +444,19 @@ export const PagePpeIssuanceStatements = () => {
         },
     ];
 
+    // --------------------------------------------------
     // Колонки строк ведомости
+    // --------------------------------------------------
+
     const itemColumns: ColumnsType<PpeIssuanceStatementItem> = [
         {
-            title: "Сотрудник",
-            key: "employee",
-            render: (_: unknown, record) =>
-                record.expand?.employee?.fullName ?? "-",
+            title: "Номенклатура по нормам СИЗ",
+            dataIndex: "nomenclature",
+            key: "nomenclature",
+            render: (value: string) => value?.trim() || "—",
         },
         {
-            title: "Табельный номер",
-            key: "personnelNumber",
-            render: (_: unknown, record) =>
-                record.expand?.employee?.personnelNumber ?? "-",
-        },
-        {
-            title: "Должность по трудовому",
-            key: "contractPosition",
-            render: (_: unknown, record) =>
-                record.expand?.contractPosition?.name ?? "-",
-        },
-        {
-            title: "СИЗ",
+            title: "Номенклатура складского учёта",
             key: "warehouse_nomenclature",
             render: (_: unknown, record) =>
                 record.expand?.warehouse_nomenclature?.name ?? "-",
@@ -340,10 +493,34 @@ export const PagePpeIssuanceStatements = () => {
         },
     ];
 
+    // --------------------------------------------------
+    // Должности сотрудника
+    // --------------------------------------------------
+
+    const contractPositionName =
+        selectedEmployee?.expand?.contractPosition?.name ??
+        divisions
+            .find(division => division.id === selectedStatement?.division)
+            ?.expand?.contract_positions
+            ?.find(position => position.id === selectedEmployee?.contractPosition)
+            ?.name ??
+        "-";
+
+    const ppePositionName =
+        selectedEmployee?.expand?.positionRelation?.name ??
+        positions.find(
+            position => position.id === selectedEmployee?.positionRelation
+        )?.name ??
+        "-";
+
+    // --------------------------------------------------
+    // Интерфейс
+    // --------------------------------------------------
+
     return (
         <>
             <Typography.Title level={2}>
-                <FileTextTwoTone /> Ведомости выдачи СИЗ
+                <FileTextTwoTone /> Ведомости выдачи СИЗ по сотрудникам
             </Typography.Title>
 
             {/* Выбор подразделения */}
@@ -370,14 +547,17 @@ export const PagePpeIssuanceStatements = () => {
                     <Button
                         type="primary"
                         icon={<PlusOutlined />}
-                        onClick={() => setIsCreateModalOpen(true)}
+                        onClick={() => {
+                            statementForm.resetFields();
+                            setIsCreateModalOpen(true);
+                        }}
                     >
                         Создать ведомость
                     </Button>
                 </Space>
             </div>
 
-            {/* Список ведомостей */}
+            {/* Список ведомостей подразделения */}
             {selectedDivision && !selectedStatement && (
                 <Table
                     rowKey="id"
@@ -385,6 +565,9 @@ export const PagePpeIssuanceStatements = () => {
                     dataSource={divisionStatements}
                     columns={statementColumns}
                     pagination={{ pageSize: 10 }}
+                    locale={{
+                        emptyText: "В выбранном подразделении ведомостей пока нет",
+                    }}
                 />
             )}
 
@@ -398,20 +581,17 @@ export const PagePpeIssuanceStatements = () => {
 
                         <Space wrap>
                             <Button
+                                icon={<FileTextTwoTone />}
+                                onClick={() => window.print()}
+                            >
+                                Печать ведомости
+                            </Button>
+                            <Button
                                 type="primary"
                                 icon={<PlusOutlined />}
-                                onClick={() => {
-                                    itemsForm.setFieldsValue({
-                                        items: [
-                                            {
-                                                quantity: 1,
-                                            } as StatementItemFormValue,
-                                        ],
-                                    });
-                                    setIsAddItemsModalOpen(true);
-                                }}
+                                onClick={() => void openAddItemsModal()}
                             >
-                                Добавить сотрудников и СИЗ
+                                Добавить нормы СИЗ
                             </Button>
 
                             <Button onClick={() => setSelectedStatement(null)}>
@@ -422,7 +602,7 @@ export const PagePpeIssuanceStatements = () => {
 
                     <div className="bg-blue-300/20 p-4 rounded-lg">
                         <p>
-                            <strong>Дата:</strong>{" "}
+                            <strong>Дата ведомости:</strong>{" "}
                             {new Date(selectedStatement.statementDate)
                                 .toLocaleDateString("ru-RU")}
                         </p>
@@ -434,17 +614,30 @@ export const PagePpeIssuanceStatements = () => {
                             )?.name ?? "-"}
                         </p>
 
+                        <Divider className="my-3" />
+
                         <p>
-                            <strong>Ответственный:</strong>{" "}
-                            {employees.find(
-                                employee =>
-                                    employee.id === selectedStatement.responsibleEmployee
-                            )?.fullName ?? "-"}
+                            <strong>Сотрудник:</strong>{" "}
+                            {selectedEmployee?.fullName ??
+                                selectedStatement.expand?.employee?.fullName ??
+                                "-"}
                         </p>
 
                         <p>
-                            <strong>Основание:</strong>{" "}
-                            {selectedStatement.basis || "-"}
+                            <strong>Табельный номер:</strong>{" "}
+                            {selectedEmployee?.personnelNumber ??
+                                selectedStatement.expand?.employee?.personnelNumber ??
+                                "-"}
+                        </p>
+
+                        <p>
+                            <strong>Должность по трудовому договору:</strong>{" "}
+                            {contractPositionName}
+                        </p>
+
+                        <p>
+                            <strong>Должность по СИЗ:</strong>{" "}
+                            {ppePositionName}
                         </p>
                     </div>
 
@@ -454,14 +647,16 @@ export const PagePpeIssuanceStatements = () => {
                         dataSource={selectedStatementItems}
                         columns={itemColumns}
                         pagination={{ pageSize: 10 }}
-                        locale={{ emptyText: "В ведомости пока нет сотрудников" }}
+                        locale={{
+                            emptyText: "В ведомости пока нет позиций СИЗ",
+                        }}
                     />
                 </div>
             )}
 
             {/* Создание ведомости */}
             <Modal
-                title="Создание ведомости"
+                title="Создание ведомости на сотрудника"
                 open={isCreateModalOpen}
                 onCancel={() => {
                     setIsCreateModalOpen(false);
@@ -478,7 +673,12 @@ export const PagePpeIssuanceStatements = () => {
                     <Form.Item
                         label="Номер ведомости"
                         name="statementNumber"
-                        rules={[{ required: true, message: "Введите номер ведомости" }]}
+                        rules={[
+                            {
+                                required: true,
+                                message: "Введите номер ведомости",
+                            },
+                        ]}
                     >
                         <Input />
                     </Form.Item>
@@ -486,34 +686,51 @@ export const PagePpeIssuanceStatements = () => {
                     <Form.Item
                         label="Дата ведомости"
                         name="statementDate"
-                        rules={[{ required: true, message: "Выберите дату" }]}
+                        rules={[
+                            {
+                                required: true,
+                                message: "Выберите дату",
+                            },
+                        ]}
                     >
-                        <DatePicker className="w-full" format="DD.MM.YYYY" />
+                        <DatePicker
+                            className="w-full"
+                            format="DD.MM.YYYY"
+                        />
                     </Form.Item>
 
                     <Form.Item
                         label="Подразделение"
                         name="division"
-                        rules={[{ required: true, message: "Выберите подразделение" }]}
+                        rules={[
+                            {
+                                required: true,
+                                message: "Выберите подразделение",
+                            },
+                        ]}
                     >
                         <Select
+                            showSearch
+                            optionFilterProp="label"
                             options={divisions.map(division => ({
                                 value: division.id,
                                 label: division.name,
                             }))}
                             onChange={() => {
-                                statementForm.setFieldValue(
-                                    "responsibleEmployee",
-                                    undefined
-                                );
+                                statementForm.setFieldValue("employee", undefined);
                             }}
                         />
                     </Form.Item>
 
                     <Form.Item
-                        label="Ответственный"
-                        name="responsibleEmployee"
-                        rules={[{ required: true, message: "Выберите ответственного" }]}
+                        label="Сотрудник"
+                        name="employee"
+                        rules={[
+                            {
+                                required: true,
+                                message: "Выберите сотрудника",
+                            },
+                        ]}
                     >
                         <Select
                             showSearch
@@ -521,18 +738,54 @@ export const PagePpeIssuanceStatements = () => {
                             disabled={!formDivision}
                             options={divisionEmployees.map(employee => ({
                                 value: employee.id,
-                                label: employee.fullName,
+                                label: `${employee.fullName} (${employee.personnelNumber})`,
                             }))}
                         />
                     </Form.Item>
 
-                    <Form.Item
-                        label="Основание"
-                        name="basis"
-                        rules={[{ required: true, message: "Укажите основание" }]}
-                    >
-                        <Input.TextArea rows={3} />
-                    </Form.Item>
+                    {formEmployee && (
+                        <div className="bg-gray-100 rounded-lg p-3 mb-4">
+                            {(() => {
+                                const employee = employees.find(
+                                    item => item.id === formEmployee
+                                );
+
+                                if (!employee) return null;
+
+                                const contractPosition =
+                                    employee.expand?.contractPosition?.name ??
+                                    divisions
+                                        .find(division => division.id === formDivision)
+                                        ?.expand?.contract_positions
+                                        ?.find(
+                                            position =>
+                                                position.id === employee.contractPosition
+                                        )?.name ??
+                                    "-";
+
+                                const ppePosition =
+                                    employee.expand?.positionRelation?.name ??
+                                    positions.find(
+                                        position =>
+                                            position.id === employee.positionRelation
+                                    )?.name ??
+                                    "-";
+
+                                return (
+                                    <>
+                                        <p>
+                                            <strong>Должность по трудовому договору:</strong>{" "}
+                                            {contractPosition}
+                                        </p>
+                                        <p>
+                                            <strong>Должность по СИЗ:</strong>{" "}
+                                            {ppePosition}
+                                        </p>
+                                    </>
+                                );
+                            })()}
+                        </div>
+                    )}
 
                     <Button
                         type="primary"
@@ -545,200 +798,71 @@ export const PagePpeIssuanceStatements = () => {
                 </Form>
             </Modal>
 
-            {/* Добавление сотрудников и СИЗ */}
+            {/* Добавление норм и складской номенклатуры */}
             <Modal
-                title="Добавление сотрудников и СИЗ"
+                title="Нормы выдачи СИЗ сотруднику"
                 open={isAddItemsModalOpen}
                 onCancel={() => {
                     setIsAddItemsModalOpen(false);
                     itemsForm.resetFields();
+                    setStandards([]);
                 }}
                 footer={null}
-                width={900}
+                width={1000}
                 destroyOnHidden
             >
-                <Form
-                    form={itemsForm}
-                    layout="vertical"
-                    onFinish={handleAddStatementItems}
-                >
-                    <Form.List name="items">
-                        {(fields, { add, remove }) => (
-                            <>
-                                {fields.map(({ key, name, ...restField }) => (
-                                    <div
-                                        key={key}
-                                        className="border rounded-lg p-4 mb-4"
-                                    >
-                                        <div className="flex justify-between items-center">
-                                            <Typography.Title level={5}>
-                                                Позиция {name + 1}
-                                            </Typography.Title>
+                <div className="mb-4">
+                    <Typography.Text strong>
+                        Сотрудник: {selectedEmployee?.fullName ?? "-"}
+                    </Typography.Text>
+                    <br />
+                    <Typography.Text type="secondary">
+                        Должность по СИЗ: {ppePositionName}
+                    </Typography.Text>
+                </div>
 
-                                            <Button
-                                                danger
-                                                type="text"
-                                                icon={<DeleteOutlined />}
-                                                onClick={() => remove(name)}
-                                            >
-                                                Удалить
-                                            </Button>
-                                        </div>
-
-                                        <Form.Item
-                                            {...restField}
-                                            label="Сотрудник"
-                                            name={[name, "employee"]}
-                                            rules={[
-                                                { required: true, message: "Выберите сотрудника" },
-                                            ]}
+                {isLoadingStandards ? (
+                    <div className="flex justify-center p-8">
+                        <Spin tip="Загрузка норм СИЗ..." />
+                    </div>
+                ) : (
+                    <Form
+                        form={itemsForm}
+                        layout="vertical"
+                        onFinish={handleAddStatementItems}
+                    >
+                        <Form.List name="items">
+                            {(fields, { remove, add }) => (
+                                <>
+                                    {fields.map(({ key, name, ...restField }) => (
+                                        <div
+                                            key={key}
+                                            className="border rounded-lg p-4 mb-4"
                                         >
-                                            <Select
-                                                showSearch
-                                                optionFilterProp="label"
-                                                options={statementEmployees.map(employee => ({
-                                                    value: employee.id,
-                                                    label: `${employee.fullName} (${employee.personnelNumber})`,
-                                                }))}
-                                            />
-                                        </Form.Item>
+                                            <div className="flex justify-between items-center mb-3">
+                                                <Typography.Title level={5} className="!mb-0">
+                                                    Позиция {name + 1}
+                                                </Typography.Title>
 
-                                        <Form.Item
-                                            label="Должность по трудовому договору"
-                                            name={[name, "contractPosition"]}
-                                            rules={[
-                                                { required: true, message: "Выберите должность" },
-                                            ]}
-                                        >
-                                            <Select
-                                                showSearch
-                                                optionFilterProp="label"
-                                                options={
-                                                    divisions
-                                                        .find(division => division.id === selectedStatement?.division)
-                                                        ?.expand?.contract_positions?.map(position => ({
-                                                        value: position.id,
-                                                        label: position.name,
-                                                    })) ?? []
-                                                }
-                                            />
-                                        </Form.Item>
-
-                                        <Form.Item
-                                            {...restField}
-                                            label="Должность по СИЗ"
-                                            name={[name, "ppePosition"]}
-                                            rules={[
-                                                { required: true, message: "Выберите должность по СИЗ" },
-                                            ]}
-                                        >
-                                            <Select
-                                                showSearch
-                                                optionFilterProp="label"
-                                                options={positions.map(position => ({
-                                                    value: position.id,
-                                                    label: position.name,
-                                                }))}
-                                                onChange={async value => {
-                                                    try {
-                                                        const standards =
-                                                            await getsPositionPpeStandards(value);
-
-                                                        const standard = standards[0];
-
-                                                        if (standard) {
-                                                            itemsForm.setFieldValue(
-                                                                ["items", name, "comment"],
-                                                                `Норма: ${standard.issuance_norm}. Основание: ${standard.issuance_basis}`
-                                                            );
-                                                        } else {
-                                                            itemsForm.setFieldValue(
-                                                                ["items", name, "comment"],
-                                                                ""
-                                                            );
-                                                        }
-                                                    } catch (error) {
-                                                        console.error(error);
-                                                        message.error("Не удалось загрузить нормы СИЗ");
-                                                    }
-                                                }}
-                                            />
-                                        </Form.Item>
-
-                                        <Form.Item
-                                            noStyle
-                                            shouldUpdate={(prev, current) =>
-                                                prev.items?.[name]?.ppePosition !==
-                                                current.items?.[name]?.ppePosition
-                                            }
-                                        >
-                                            {({ getFieldValue }) => {
-                                                const ppePosition = getFieldValue([
-                                                    "items",
-                                                    name,
-                                                    "ppePosition",
-                                                ]);
-
-                                                return ppePosition ? (
-                                                    <PpeStandardsInfo
-                                                        positionId={ppePosition}
-                                                    />
-                                                ) : null;
-                                            }}
-                                        </Form.Item>
-
-                                        <Form.Item
-                                            {...restField}
-                                            label="СИЗ со склада"
-                                            name={[name, "warehouse_nomenclature"]}
-                                            rules={[
-                                                { required: true, message: "Выберите СИЗ" },
-                                            ]}
-                                        >
-                                            <Select
-                                                showSearch
-                                                optionFilterProp="label"
-                                                options={warehouseNomenclature.map(item => ({
-                                                    value: item.id,
-                                                    label: `${item.name} (${item.productCode})`,
-                                                }))}
-                                                onChange={value => {
-                                                    const selected =
-                                                        warehouseNomenclature.find(
-                                                            item => item.id === value
-                                                        );
-
-                                                    if (selected) {
-                                                        itemsForm.setFieldValue(
-                                                            ["items", name, "unit"],
-                                                            selected.unit
-                                                        );
-                                                    }
-                                                }}
-                                            />
-                                        </Form.Item>
-
-                                        <div className="grid grid-cols-2 gap-3">
-                                            <Form.Item
-                                                {...restField}
-                                                label="Количество"
-                                                name={[name, "quantity"]}
-                                                rules={[
-                                                    { required: true, message: "Укажите количество" },
-                                                ]}
-                                            >
-                                                <InputNumber
-                                                    min={1}
-                                                    className="w-full"
-                                                />
-                                            </Form.Item>
+                                                <Button
+                                                    danger
+                                                    type="text"
+                                                    icon={<DeleteOutlined />}
+                                                    onClick={() => remove(name)}
+                                                >
+                                                    Удалить
+                                                </Button>
+                                            </div>
 
                                             <Form.Item
                                                 {...restField}
-                                                label="Единица измерения"
-                                                name={[name, "unit"]}
+                                                label="Номенклатура по нормам СИЗ"
+                                                name={[name, "nomenclature"]}
                                                 rules={[
-                                                    { required: true, message: "Укажите единицу" },
+                                                    {
+                                                        required: true,
+                                                        message: "Не указана номенклатура по нормам",
+                                                    },
                                                 ]}
                                             >
                                                 <Input />
@@ -746,143 +870,148 @@ export const PagePpeIssuanceStatements = () => {
 
                                             <Form.Item
                                                 {...restField}
-                                                label="Срок носки"
-                                                name={[name, "wearPeriod"]}
+                                                label="Номенклатура складского учёта"
+                                                name={[name, "warehouse_nomenclature"]}
+                                                rules={[
+                                                    {
+                                                        required: true,
+                                                        message: "Выберите складскую номенклатуру",
+                                                    },
+                                                ]}
                                             >
-                                                <InputNumber
-                                                    min={1}
-                                                    className="w-full"
+                                                <Select
+                                                    showSearch
+                                                    optionFilterProp="label"
+                                                    options={warehouseNomenclature.map(item => ({
+                                                        value: item.id,
+                                                        label: `${item.name} (${item.productCode})`,
+                                                    }))}
+                                                    onChange={value => {
+                                                        const selected =
+                                                            warehouseNomenclature.find(
+                                                                item => item.id === value
+                                                            );
+
+                                                        if (selected) {
+                                                            itemsForm.setFieldValue(
+                                                                ["items", name, "unit"],
+                                                                selected.unit
+                                                            );
+                                                        }
+                                                    }}
                                                 />
                                             </Form.Item>
+
+                                            <div className="grid grid-cols-2 gap-3">
+                                                <Form.Item
+                                                    {...restField}
+                                                    label="Количество"
+                                                    name={[name, "quantity"]}
+                                                    rules={[
+                                                        {
+                                                            required: true,
+                                                            message: "Укажите количество",
+                                                        },
+                                                    ]}
+                                                >
+                                                    <InputNumber
+                                                        min={1}
+                                                        className="w-full"
+                                                    />
+                                                </Form.Item>
+
+                                                <Form.Item
+                                                    {...restField}
+                                                    label="Единица измерения"
+                                                    name={[name, "unit"]}
+                                                    rules={[
+                                                        {
+                                                            required: true,
+                                                            message: "Укажите единицу измерения",
+                                                        },
+                                                    ]}
+                                                >
+                                                    <Input />
+                                                </Form.Item>
+
+                                                <Form.Item
+                                                    {...restField}
+                                                    label="Срок носки (в месяцах)"
+                                                    name={[name, "wearPeriod"]}
+                                                >
+                                                    <InputNumber
+                                                        min={1}
+                                                        className="w-full"
+                                                    />
+                                                </Form.Item>
+
+                                                <Form.Item
+                                                    {...restField}
+                                                    label="Единица срока"
+                                                    name={[name, "wearPeriodUnit"]}
+                                                >
+                                                    <Select
+                                                        options={[
+                                                            {
+                                                                value: "month",
+                                                                label: "Месяцы",
+                                                            },
+                                                        ]}
+                                                    />
+                                                </Form.Item>
+                                            </div>
 
                                             <Form.Item
                                                 {...restField}
-                                                label="Единица срока"
-                                                name={[name, "wearPeriodUnit"]}
+                                                label="Комментарий"
+                                                name={[name, "comment"]}
                                             >
-                                                <Select
-                                                    allowClear
-                                                    options={[
-                                                        { value: "day", label: "Дни" },
-                                                        { value: "month", label: "Месяцы" },
-                                                        { value: "year", label: "Годы" },
-                                                    ]}
-                                                />
+                                                <Input.TextArea rows={2} />
                                             </Form.Item>
                                         </div>
+                                    ))}
 
-                                        <Form.Item
-                                            {...restField}
-                                            label="Комментарий"
-                                            name={[name, "comment"]}
-                                        >
-                                            <Input.TextArea rows={2} />
-                                        </Form.Item>
-                                    </div>
-                                ))}
+                                    <Button
+                                        type="dashed"
+                                        block
+                                        icon={<PlusOutlined />}
+                                        onClick={() =>
+                                            add({
+                                                quantity: 1,
+                                                unit: "",
+                                                nomenclature: "",
+                                                warehouse_nomenclature: "",
+                                            })
+                                        }
+                                    >
+                                        Добавить позицию вручную
+                                    </Button>
+                                </>
+                            )}
+                        </Form.List>
 
-                                <Button
-                                    type="dashed"
-                                    block
-                                    icon={<PlusOutlined />}
-                                    onClick={() => add({ quantity: 1 })}
-                                >
-                                    Добавить ещё позицию
-                                </Button>
-                            </>
-                        )}
-                    </Form.List>
+                        <Divider />
 
-                    <Divider />
-
-                    <Button
-                        type="primary"
-                        htmlType="submit"
-                        loading={isSavingItems}
-                        block
-                    >
-                        Сохранить позиции
-                    </Button>
-                </Form>
+                        <Button
+                            type="primary"
+                            htmlType="submit"
+                            loading={isSavingItems}
+                            block
+                            disabled={standards.length === 0 && !itemsForm.getFieldValue("items")?.length}
+                        >
+                            Сохранить позиции
+                        </Button>
+                    </Form>
+                )}
             </Modal>
+            {selectedStatement && (
+                <PpeIssuanceStatementPrint
+                    statement={selectedStatement}
+                    items={selectedStatementItems}
+                    employees={employees}
+                    divisions={divisions}
+                />
+            )}
         </>
-    );
-};
-
-// Информация о нормах выбранной должности
-const PpeStandardsInfo = ({ positionId }: { positionId: string }) => {
-    const [standards, setStandards] = useState<PpeIssuanceStandard[]>([]);
-    const [loading, setLoading] = useState(false);
-
-    useEffect(() => {
-        let active = true;
-
-        const load = async () => {
-            setLoading(true);
-
-            try {
-                const data = await getsPositionPpeStandards(positionId);
-
-                if (active) {
-                    setStandards(data);
-                }
-            } catch (error) {
-                console.error(error);
-
-                if (active) {
-                    message.error("Не удалось загрузить нормы для должности");
-                }
-            } finally {
-                if (active) {
-                    setLoading(false);
-                }
-            }
-        };
-
-        void load();
-
-        return () => {
-            active = false;
-        };
-    }, [positionId]);
-
-    if (loading) {
-        return (
-            <Typography.Text type="secondary">
-                Загрузка норм СИЗ...
-            </Typography.Text>
-        );
-    }
-
-    if (standards.length === 0) {
-        return (
-            <Typography.Text type="secondary">
-                Для выбранной должности нормы не найдены
-            </Typography.Text>
-        );
-    }
-
-    return (
-        <div className="bg-gray-100 rounded p-3 mb-4">
-            <Typography.Text strong>
-                Нормы выдачи для должности:
-            </Typography.Text>
-
-            {standards.map(standard => (
-                <div key={standard.id} className="mt-2">
-                    <Typography.Text>
-                        {standard.ppe_name} — {standard.issuance_norm}
-                    </Typography.Text>
-
-                    {standard.issuance_basis && (
-                        <div>
-                            <Typography.Text type="secondary">
-                                Основание: {standard.issuance_basis}
-                            </Typography.Text>
-                        </div>
-                    )}
-                </div>
-            ))}
-        </div>
     );
 };

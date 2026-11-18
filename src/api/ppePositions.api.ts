@@ -19,6 +19,7 @@ export interface PpeIssuanceStandard {
     ppe_name: string;
     issuance_norm: string;
     issuance_basis: string;
+    issuance_period?: string;
 }
 
 // Все должности справочника
