@@ -7,7 +7,7 @@ import {
     Input,
     Typography,
     Row,
-    Col, Divider, message, Popconfirm, Tag, DatePicker, Select
+    Col, Divider, message, Popconfirm, Tag, DatePicker, Select, Tabs
 } from "antd";
 import dayjs, {Dayjs} from "dayjs";
 import {createStaticStyles} from "antd-style";
@@ -20,6 +20,7 @@ import type {ContractPosition} from "../../types/contractPositions.ts";
 import type {Division} from "../../types/divisions.ts";
 import type { Position } from "../../api/ppePositions.api.ts";
 import {deleteEmployee, updateEmployee} from "../../api/employees.api.ts";
+import {EmployeeIssuanceHistory} from "./EmployeeIssuanceHistory.tsx";
 interface EmployeeFormValues {
     fullName: string;
     position: string;
@@ -68,6 +69,8 @@ interface SharedContentProps {
     allContractPositions?: ContractPosition[];
     allPpePositions: Position[];
     allDivisions: Division[];
+    setActiveTab: React.Dispatch<React.SetStateAction<string>>;
+    activeTab: string;
 }
 
 const SharedContent = ({
@@ -79,7 +82,9 @@ const SharedContent = ({
                            onEmployeeUpdated,
                            allContractPositions,
                            allPpePositions,
-                           allDivisions}: SharedContentProps) => {
+                           allDivisions,
+                           setActiveTab,
+                           activeTab}: SharedContentProps) => {
 
     const [loading, setLoading] = useState(false);
 
@@ -161,150 +166,172 @@ const SharedContent = ({
 
     return (
         <>
-        <Typography.Title level={3}>
-            Данные сотрудника:
-        </Typography.Title>
-            <Divider/>
-            {isEdit ? (
-                <>
-                    <Form layout={"vertical"} form={form} onFinish={handleSave}>
-                        <div className={'grid grid-cols-2 gap-4'}>
-                            <Form.Item label={'Фио'} name={'fullName'}>
-                                <Input/>
-                            </Form.Item>
-                            <Form.Item label={'Должность по трудовому договору'} name={'contractPosition'}>
-                                <Select
-                                    options={(allContractPositions ?? []).map((item) => ({
-                                    label: item.name,
-                                    value: item.id
-                                }))}/>
-                            </Form.Item>
-                            <Form.Item label={'Должность по СИЗ'} name={'positionRelation'}>
-                                <Select
-                                    options={allPpePositions.map((item) => ({
-                                        label: item.name,
-                                        value: item.id
-                                    }))}
-                                />
-                            </Form.Item>
+            <Tabs
+                activeKey={activeTab}
+                onChange={setActiveTab}
+                items={[
+                    {
+                        key: "employee",
+                        label: "Данные сотрудника",
+                        children: (
+                            <>
+                                <Typography.Title level={3}>
+                                    Данные сотрудника:
+                                </Typography.Title>
+                                <Divider/>
+                                {isEdit ? (
+                                    <>
+                                        <Form layout={"vertical"} form={form} onFinish={handleSave}>
+                                            <div className={'grid grid-cols-2 gap-4'}>
+                                                <Form.Item label={'Фио'} name={'fullName'}>
+                                                    <Input/>
+                                                </Form.Item>
+                                                <Form.Item label={'Должность по трудовому договору'} name={'contractPosition'}>
+                                                    <Select
+                                                        options={(allContractPositions ?? []).map((item) => ({
+                                                            label: item.name,
+                                                            value: item.id
+                                                        }))}/>
+                                                </Form.Item>
+                                                <Form.Item label={'Должность по СИЗ'} name={'positionRelation'}>
+                                                    <Select
+                                                        options={allPpePositions.map((item) => ({
+                                                            label: item.name,
+                                                            value: item.id
+                                                        }))}
+                                                    />
+                                                </Form.Item>
 
-                            <Form.Item label={'Подразделение'} name={'division'}>
-                                <Select options={allDivisions.map((item) => ({
-                                    label: item.name,
-                                    value: item.id
-                                }))}/>
-                            </Form.Item>
-                            <Form.Item label={'Табельный номер'} name={'personnelNumber'}>
-                                <Input/>
-                            </Form.Item>
-                            <Form.Item label={'Дата приема на работу'} name={'date_of_employment'}>
-                                <DatePicker
-                                    className="w-full"
-                                    placeholder="Выберите дату"
-                                    format="DD.MM.YYYY"
-                                />
-                            </Form.Item>
-                            <Form.Item label={'Рост'} name={'height'}>
-                                <Input/>
-                            </Form.Item>
-                            <Form.Item label={'Размер одежды'} name={'clothingSize'}>
-                                <Input/>
-                            </Form.Item>
-                            <Form.Item label={'Размер обуви'} name={'shoeSize'}>
-                                <Input/>
-                            </Form.Item>
-                            <Form.Item label={'Комментарий'} name={'comment'}>
-                                <Input.TextArea/>
-                            </Form.Item>
-                        </div>
+                                                <Form.Item label={'Подразделение'} name={'division'}>
+                                                    <Select options={allDivisions.map((item) => ({
+                                                        label: item.name,
+                                                        value: item.id
+                                                    }))}/>
+                                                </Form.Item>
+                                                <Form.Item label={'Табельный номер'} name={'personnelNumber'}>
+                                                    <Input/>
+                                                </Form.Item>
+                                                <Form.Item label={'Дата приема на работу'} name={'date_of_employment'}>
+                                                    <DatePicker
+                                                        className="w-full"
+                                                        placeholder="Выберите дату"
+                                                        format="DD.MM.YYYY"
+                                                    />
+                                                </Form.Item>
+                                                <Form.Item label={'Рост'} name={'height'}>
+                                                    <Input/>
+                                                </Form.Item>
+                                                <Form.Item label={'Размер одежды'} name={'clothingSize'}>
+                                                    <Input/>
+                                                </Form.Item>
+                                                <Form.Item label={'Размер обуви'} name={'shoeSize'}>
+                                                    <Input/>
+                                                </Form.Item>
+                                                <Form.Item label={'Комментарий'} name={'comment'}>
+                                                    <Input.TextArea/>
+                                                </Form.Item>
+                                            </div>
 
-                        <div className={'flex flex-row justify-end gap-1'}>
-                            <Button onClick={handleCancelEdit}>Отмена</Button>
-                            <Button htmlType={'submit'} loading={loading}>Сохранить</Button>
-                        </div>
-                    </Form>
-                </>
-            ) : (
-                <>
-                <div className={'grid grid-cols-2 gap-4'}>
-                    <div className={'flex flex-col'}>
-                        <Text strong>ФИО</Text>
-                        <Text>{employee?.fullName}</Text>
-                    </div>
-                    <div className={'flex flex-col'}>
-                        <Text strong>Подразделение</Text>
-                        <Text>{employee?.expand?.division?.name}</Text>
-                    </div>
-                    <div className={'flex flex-col'}>
-                        <Text strong>Должность по трудовому договору</Text>
-                        <Text>{employee?.expand?.contractPosition?.name}</Text>
-                    </div>
-                    <div className={'flex flex-col'}>
-                        <Text strong>Должность по СИЗ</Text>
-                        <Text>{employee?.expand?.positionRelation?.name}</Text>
-                    </div>
-                    <div className={'flex flex-col'}>
-                        <Text strong>Табельный номер</Text>
-                        <Text>{employee?.personnelNumber}</Text>
-                    </div>
-                    <div className={'flex flex-col'}>
-                        <Text strong>Дата приема на работу</Text>
-                        <Text>{employee?.date_of_employment === '' ? 'Не указано' : formatDateOfEmployment(employee?.date_of_employment)}</Text>
-                    </div>
-                    <div className={'flex flex-col'}>
-                        <Text strong>Рост</Text>
-                        <Text>{employee?.height}</Text>
-                    </div>
-                    <div className={'flex flex-col'}>
-                        <Text strong>Размер одежды</Text>
-                        <Text>{employee?.clothingSize}</Text>
-                    </div>
-                    <div className={'flex flex-col'}>
-                        <Text strong>Размер обуви</Text>
-                        <Text>{employee?.shoeSize}</Text>
-                    </div>
-                    <div className={'flex flex-col'}>
-                        <Text strong>Комментарий</Text>
-                        <Text>{employee?.comment === '' ? 'Не указано' :employee?.comment}</Text>
-                    </div>
-                </div>
-                    <div className={'flex justify-end'}>
-                        <Button
-                            color={'blue'}
-                            variant={'filled'}
-                            onClick={() => {handleStartEdit()}}
-                            className={'m-1'}
-                        >
-                            Редактировать
-                        </Button>
+                                            <div className={'flex flex-row justify-end gap-1'}>
+                                                <Button onClick={handleCancelEdit}>Отмена</Button>
+                                                <Button htmlType={'submit'} loading={loading}>Сохранить</Button>
+                                            </div>
+                                        </Form>
+                                    </>
+                                ) : (
+                                    <>
+                                        <div className={'grid grid-cols-2 gap-4'}>
+                                            <div className={'flex flex-col'}>
+                                                <Text strong>ФИО</Text>
+                                                <Text>{employee?.fullName}</Text>
+                                            </div>
+                                            <div className={'flex flex-col'}>
+                                                <Text strong>Подразделение</Text>
+                                                <Text>{employee?.expand?.division?.name}</Text>
+                                            </div>
+                                            <div className={'flex flex-col'}>
+                                                <Text strong>Должность по трудовому договору</Text>
+                                                <Text>{employee?.expand?.contractPosition?.name}</Text>
+                                            </div>
+                                            <div className={'flex flex-col'}>
+                                                <Text strong>Должность по СИЗ</Text>
+                                                <Text>{employee?.expand?.positionRelation?.name}</Text>
+                                            </div>
+                                            <div className={'flex flex-col'}>
+                                                <Text strong>Табельный номер</Text>
+                                                <Text>{employee?.personnelNumber}</Text>
+                                            </div>
+                                            <div className={'flex flex-col'}>
+                                                <Text strong>Дата приема на работу</Text>
+                                                <Text>{employee?.date_of_employment === '' ? 'Не указано' : formatDateOfEmployment(employee?.date_of_employment)}</Text>
+                                            </div>
+                                            <div className={'flex flex-col'}>
+                                                <Text strong>Рост</Text>
+                                                <Text>{employee?.height}</Text>
+                                            </div>
+                                            <div className={'flex flex-col'}>
+                                                <Text strong>Размер одежды</Text>
+                                                <Text>{employee?.clothingSize}</Text>
+                                            </div>
+                                            <div className={'flex flex-col'}>
+                                                <Text strong>Размер обуви</Text>
+                                                <Text>{employee?.shoeSize}</Text>
+                                            </div>
+                                            <div className={'flex flex-col'}>
+                                                <Text strong>Комментарий</Text>
+                                                <Text>{employee?.comment === '' ? 'Не указано' :employee?.comment}</Text>
+                                            </div>
+                                        </div>
+                                        <div className={'flex justify-end'}>
+                                            <Button
+                                                color={'blue'}
+                                                variant={'filled'}
+                                                onClick={() => {handleStartEdit()}}
+                                                className={'m-1'}
+                                            >
+                                                Редактировать
+                                            </Button>
 
-                        <Popconfirm
-                            title={'Удалить сотрудника?'}
-                            description={'Это действие нельзя отменить'}
-                            okText={'Удалить'}
-                            cancelText={'Отмена'}
-                            okButtonProps={{danger: true}}
-                            onConfirm={() => {handleDelete()}}
-                        >
-                            <Button
-                                color={'danger'}
-                                variant={'filled'}
-                                className={'m-1'}
-                            >
-                                Удалить сотрудника
-                            </Button>
-                        </Popconfirm>
-                    </div>
-                </>
-            )}
-            <Divider/>
-            <Typography.Title level={3}>
-                Нормы выдачи СИЗ:
-            </Typography.Title>
-
-            <EmployeeRecordTable
-                positionId={employee?.positionRelation}
-                ppeIssuanceStandards={ppeIssuanceStandards}
+                                            <Popconfirm
+                                                title={'Удалить сотрудника?'}
+                                                description={'Это действие нельзя отменить'}
+                                                okText={'Удалить'}
+                                                cancelText={'Отмена'}
+                                                okButtonProps={{danger: true}}
+                                                onConfirm={() => {handleDelete()}}
+                                            >
+                                                <Button
+                                                    color={'danger'}
+                                                    variant={'filled'}
+                                                    className={'m-1'}
+                                                >
+                                                    Удалить сотрудника
+                                                </Button>
+                                            </Popconfirm>
+                                        </div>
+                                    </>
+                                )}
+                            </>
+                        ),
+                    },
+                    {
+                        key: "standards",
+                        label: "Нормы выдачи СИЗ",
+                        children: (
+                            <EmployeeRecordTable
+                                positionId={employee?.positionRelation}
+                                ppeIssuanceStandards={ppeIssuanceStandards}
+                            />
+                        ),
+                    },
+                    {
+                        key: "history",
+                        label: "История выдачи СИЗ",
+                        children: (
+                            <EmployeeIssuanceHistory employeeId={employee?.id} />
+                        ),
+                    },
+                ]}
             />
         </>
     );
@@ -363,12 +390,14 @@ export const EmployeeRecord = ({
                                    allDivisions}: SelectProp) => {
     const [isEdit, setEdit] = useState(false);
 
+    const [activeTab, setActiveTab] = useState('employee');
+
     const handleDelete = async () => {
         if(employee === undefined) return;
         try {
             await deleteEmployee(employee.id)
             onDelete()
-            onClose();
+            handleClose()
         } catch (error) {
             message.error('Ошибка удаления сотрудника');
         }
@@ -376,6 +405,7 @@ export const EmployeeRecord = ({
 
     const handleClose = () => {
         setEdit(false);
+        setActiveTab('employee');
         onClose();
     }
 
@@ -396,7 +426,10 @@ export const EmployeeRecord = ({
             styles={stylesFn}
             mask={{ enabled: true, blur: true }}
             open={selectedEmployeeId !== null}
-            onClose={handleClose}
+            onClose={() => {handleClose()}
+
+
+        }
             closable={false}
         >
             <SharedContent
@@ -409,6 +442,8 @@ export const EmployeeRecord = ({
                 allContractPositions={allContractPositions}
                 allPpePositions={allPpePositions}
                 allDivisions={allDivisions}
+                setActiveTab={setActiveTab}
+                activeTab={activeTab}
             />
         </Drawer>
     )
