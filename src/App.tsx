@@ -10,7 +10,7 @@ import {PageSettings} from './pages/PageSettings.tsx';
 import {PagePpeIssuanceStandards} from "./pages/PagePpeIssuanceStandards.tsx";
 import {PageOfDepartaments} from "./pages/PageOfDepartaments.tsx";
 import {PageWarehouseNomenclature} from "./pages/PageWarehouseNomenclature.tsx";
-import {PageWarehouseСounterparties} from "./pages/PageWarehouseСounterparties.tsx";
+import {PageWarehouseСounterparties} from "./pages/PageWarehouseСounterparties/PageWarehouseСounterparties.tsx";
 import {PagePpeIssuanceStatements} from "./pages/PagePpeIssuanceStatements.tsx";
 import {PageGoodsReceiptNotes} from "./pages/PageGoodsReceiptNotes.tsx";
 import {PageCreateWarehouseReceipt} from "./pages/PageCreateWarehouseReceipt.tsx";

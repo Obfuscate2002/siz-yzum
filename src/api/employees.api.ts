@@ -12,9 +12,7 @@ export const getEmployes = async (): Promise<Employee[]> => {
 }
 
 export const createEmployee = async (employee: Employee): Promise<void> => {
-
-    console.log("Отправляем в PocketBase:", employee);
-    const data = await pb.collection('employees').create({
+    await pb.collection('employees').create({
         fullName: employee.fullName,
         contractPosition: employee.contractPosition,
         positionRelation: employee.positionRelation,
@@ -26,8 +24,6 @@ export const createEmployee = async (employee: Employee): Promise<void> => {
         clothingSize: employee.clothingSize,
         height: employee.height,
     })
-
-    console.log("Возвращается с бэка PocketBase:", data);
 }
 
 export const updateEmployee = async (id: string, data: Partial<Employee>): Promise<Employee> => {

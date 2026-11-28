@@ -4,7 +4,6 @@ import {
     Divider,
     Form,
     Input,
-    Space,
     Table,
     Typography,
     type TableColumnsType,
@@ -13,8 +12,6 @@ import {
 } from "antd";
 import {
     DeleteOutlined,
-    EditOutlined,
-    EyeOutlined,
     FileTextTwoTone,
     PlusOutlined,
     SearchOutlined,
@@ -35,6 +32,7 @@ export const PageGoodsReceiptNotes = () => {
 
     const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
     const [selectedReceipt, setSelectedReceipt] = useState<WarehouseReceipt | null>(null);
+
 
     const queryClient = useQueryClient();
 
@@ -197,25 +195,6 @@ export const PageGoodsReceiptNotes = () => {
             width: 145,
             align: "center",
             render: (_value: unknown, record: WarehouseReceipt) => (
-                <Space size={4}>
-                    <Tooltip title="Просмотреть">
-                        <Button
-                            type="text"
-                            className="!text-blue-600 hover:!bg-blue-50"
-                            icon={<EyeOutlined />}
-                            onClick={() => handleView(record)}
-                        />
-                    </Tooltip>
-
-                    <Tooltip title="Редактировать">
-                        <Button
-                            type="text"
-                            className="!text-orange-500 hover:!bg-orange-50"
-                            icon={<EditOutlined />}
-                            onClick={() => handleEdit(record)}
-                        />
-                    </Tooltip>
-
                     <Tooltip title="Удалить">
                         <Button
                             type="text"
@@ -225,7 +204,6 @@ export const PageGoodsReceiptNotes = () => {
                             onClick={() => handleDelete(record)}
                         />
                     </Tooltip>
-                </Space>
             ),
         },
     ];
@@ -237,6 +215,7 @@ export const PageGoodsReceiptNotes = () => {
     }
 
 
+console.log(handleEdit)
 
     return (
         <>
@@ -294,6 +273,10 @@ export const PageGoodsReceiptNotes = () => {
                     columns={columns}
                     dataSource={warehouseReceipts}
                     loading={isLoading || isItemsLoading}
+                    onRow={(record: WarehouseReceipt) => ({
+                        onClick: () => handleView(record),
+                        style: {cursor: 'pointer'}
+                    })}
                 />
                 <WarehouseReceiptDrawer
                     open={isDrawerOpen}

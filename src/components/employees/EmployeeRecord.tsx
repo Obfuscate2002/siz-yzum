@@ -427,8 +427,6 @@ export const EmployeeRecord = ({
             mask={{ enabled: true, blur: true }}
             open={selectedEmployeeId !== null}
             onClose={() => {handleClose()}
-
-
         }
             closable={false}
         >
